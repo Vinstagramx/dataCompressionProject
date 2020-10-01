@@ -15,24 +15,31 @@ def load_data(path):
     return raw_data
 
 def fix_data(data):
+    """
+    Convert all the floats to ints and store in an np array. If possible try
+    and make the arrays 16 bit ints as they were originally.
+    """
     fixed_x = data[1] * 10000
     fixed_y = data[2] * 10000
     fixed_z = data[3] * 10000
     fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32)
     return fixed_array
 
-def delta_data(buffer_length, data_list):
+def delta_encoding(data):
+    ref_point = data[0]
+    compressed = [(i- ref_point) for i in data[1:]]
+    return [ref_point] + compressed
+
+def delta_data(buffer_length, data_list, squared = False):
     buffer_regions = [i*buffer_length for i in range(0, len(data_list)//buffer_length)]
     compressed = []
     for buffer_start in buffer_regions:
-        ref_point = data_list[buffer_start]
-        compressed.append(ref_point)
-        adjusted_list = []
-        for i in range(1, buffer_length):
-            delta = data_list[buffer_start + i] - ref_point
-            adjusted_list.append(delta)
-        #print(adjusted_list)
-        compressed.append(adjusted_list)
+        deltas = delta_encoding(data_list[buffer_start:(buffer_start+buffer_length)])
+        if squared == True: #delta squared encoding, doesn't seem to be too useful for our data
+            delta_squared = delta_encoding(deltas[1:])
+            compressed.append(delta_squared)
+        else:
+            compressed.append(deltas)
     return compressed
             
             
@@ -40,7 +47,7 @@ def delta_data(buffer_length, data_list):
 
 data = load_data(DATA_PATH)
 fixed_data = fix_data(data)
-print(delta_data(100, fixed_data[0])[0:10])
+print(delta_data(100, fixed_data[0], squared=False)[-1])
 
 
 #plt.plot(raw_data[0], raw_data[1], label = "x-data")
