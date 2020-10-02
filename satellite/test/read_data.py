@@ -73,12 +73,13 @@ def golomb(buffer_length, data_list, rice = False):
     buffer_regions = [i*buffer_length for i in range(0, len(data_list)//buffer_length)]
     compressed = []
     for buffer_start in buffer_regions:
+        print(buffer_start)
         data = data_list[buffer_start:(buffer_start+buffer_length)]
         b = int(np.mean(data))
         golombs = [golomb_encoding(i, b) for i in data]
         remainders = [binary(i[1]) for i in golombs]
         unaries = [i[0] for i in golombs]
-        compressed.append([(unaries[i], remainders[i]) for i in range(0, buffer_length)])
+        compressed = compressed + [binary(b)] + remainders + unaries 
     return compressed
     
 def bit_difference(buffer_length, data, scheme):
@@ -93,12 +94,13 @@ def bit_difference(buffer_length, data, scheme):
         compressed_bits = sum([len(binary(i)) for i in compressed])
     elif scheme == "golomb":
         compressed = golomb(buffer_length, data)
-        compressed_bits = sum([len(i[0])+len(i[1]) for i in compressed])
+        compressed_bits = sum([len(i) for i in compressed])
     else:
         raise Exception("Please supply an encoding scheme")
-    compression_ratio = incoming_bits/compressed_bits
+    compression_ratio = (1 - compressed_bits/incoming_bits) *100
     return compression_ratio
 
+<<<<<<< Updated upstream
 """
 When using the fixed_data array:
 fixed_data[0], [1], [2] = x,y,z magnetic field reading
@@ -120,6 +122,17 @@ end = time.time()
 
 time_taken = end-start
 print(f'Time taken for compression : {time_taken}s')
+=======
+
+data = load_data(DATA_PATH)
+fixed_data = fix_data(data)
+#%%
+#use bin() function to get binary equivalent - then use len ti find out # of bits
+#any reason deltas + golomb can't be used?
+#need to implement binary/huffman encoding for remainder of golob
+
+print(bit_difference(100, fixed_data[1], "golomb"))
+>>>>>>> Stashed changes
 #print(delta_data(100, fixed_data[0], squared=False)[-1])
 #print(golomb(100, fixed_data[0])[:4])
 
