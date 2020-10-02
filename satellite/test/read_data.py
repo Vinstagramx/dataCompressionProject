@@ -100,7 +100,7 @@ def bit_difference(buffer_length, data, scheme):
     compression_ratio = (1 - compressed_bits/incoming_bits) *100
     return compression_ratio
 
-<<<<<<< Updated upstream
+
 """
 When using the fixed_data array:
 fixed_data[0], [1], [2] = x,y,z magnetic field reading
@@ -122,7 +122,6 @@ end = time.time()
 
 time_taken = end-start
 print(f'Time taken for compression : {time_taken}s')
-=======
 
 data = load_data(DATA_PATH)
 fixed_data = fix_data(data)
@@ -132,7 +131,6 @@ fixed_data = fix_data(data)
 #need to implement binary/huffman encoding for remainder of golob
 
 print(bit_difference(100, fixed_data[1], "golomb"))
->>>>>>> Stashed changes
 #print(delta_data(100, fixed_data[0], squared=False)[-1])
 #print(golomb(100, fixed_data[0])[:4])
 
