@@ -61,7 +61,8 @@ def delta_data(buffer_length, data_list, squared = False):
             delta_squared = delta_encoding(deltas[1:])
             compressed.append(delta_squared)
         else:
-            compressed = compressed + deltas #edited for ease of use w/ bit_difference()
+            compressed.append(deltas) #edited for ease of use w/ bit_difference()
+    compressed = np.ndarray.flatten(np.asarray(compressed))
     return compressed
             
 def golomb_encoding(n,b):
@@ -124,12 +125,14 @@ fixed_data = fix_data(data)
 start = time.time()
 #print(bit_difference(50, fixed_data[0], "delta"))
 #delta_data(100, fixed_data[0], squared=False)
-compressed_data = golomb(100, fixed_data[0])
+#compressed_data = golomb(100, fixed_data[0])
+compressed_data = delta_data(10, fixed_data[0], squared = False)
 end = time.time()
 
 time_taken = end-start
 print(f'Time taken for compression : {time_taken}s')
 
+print(bit_difference(10, fixed_data[0], "delta"))
 #%%
 #use bin() function to get binary equivalent - then use len ti find out # of bits
 #any reason deltas + golomb can't be used?
