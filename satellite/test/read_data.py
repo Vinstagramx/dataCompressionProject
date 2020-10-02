@@ -61,7 +61,7 @@ def delta_data(buffer_length, data_list, squared = False):
             compressed.append(delta_squared)
         else:
             compressed.append(deltas) #edited for ease of use w/ bit_difference()
-    compressed = np.concatenate((compressed), axis = None)
+    compressed = np.ndarray.flatten(np.asarray(compressed))
     return compressed
             
 def golomb_encoding(n,b):
@@ -103,6 +103,15 @@ def bit_difference(buffer_length, data, scheme):
     #compression_ratio = incoming_bits/compressed_bits
     return compression_ratio
 
+def vary_buffer_size(scheme, data, min_max = (1,100)):
+    buffer_sizes = range(min_max[0], min_max[1])
+    ratios = []
+    for i in buffer_sizes:
+        ratios.append(bit_difference(i, data, scheme))
+    plt.plot(buffer_sizes, ratios)
+
+
+
 
 """
 When using the fixed_data array:
@@ -140,6 +149,8 @@ end = time.time()
 time_taken = end-start
 print(f'Time taken for compression : {time_taken}s')
 
+#%%
+vary_buffer_size("delta", fixed_data[0])
 
 
 #print(bit_difference(100, fixed_data[0], "golomb"))
