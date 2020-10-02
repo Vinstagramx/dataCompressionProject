@@ -99,15 +99,23 @@ def bit_difference(buffer_length, data, scheme):
     compression_ratio = incoming_bits/compressed_bits
     return compression_ratio
 
-start = time.time()
+"""
+When using the fixed_data array:
+fixed_data[0], [1], [2] = x,y,z magnetic field reading
+"""
 
 #use bin() function to get binary equivalent - then use len ti find out # of bits
 #any reason deltas + golomb can't be used?
 #need to implement binary/huffman encoding for remainder of golob
 data = load_data(PATH)
-fixed_data = fix_data(data)
-print(bit_difference(50, fixed_data[0], "delta"))
 
+#%%
+fixed_data = fix_data(data)
+
+#%%
+start = time.time()
+#print(bit_difference(50, fixed_data[0], "delta"))
+delta_data(100, fixed_data[0], squared=False)
 end = time.time()
 
 time_taken = end-start
