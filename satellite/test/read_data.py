@@ -60,7 +60,8 @@ def delta_data(buffer_length, data_list, squared = False):
             delta_squared = delta_encoding(deltas[1:])
             compressed.append(delta_squared)
         else:
-            compressed = compressed + deltas #edited for ease of use w/ bit_difference()
+            compressed.append(deltas) #edited for ease of use w/ bit_difference()
+    compressed = np.concatenate((compressed), axis = None)
     return compressed
             
 def golomb_encoding(n,b):
@@ -71,15 +72,16 @@ def golomb_encoding(n,b):
 
 def golomb(buffer_length, data_list, rice = False):
     buffer_regions = [i*buffer_length for i in range(0, len(data_list)//buffer_length)]
-    compressed = []
+    unaries, binaries, remainders = [], [], []
     for buffer_start in buffer_regions:
-        print(buffer_start)
+        #print(buffer_start)
         data = data_list[buffer_start:(buffer_start+buffer_length)]
         b = int(np.mean(data))
         golombs = [golomb_encoding(i, b) for i in data]
-        remainders = [binary(i[1]) for i in golombs]
-        unaries = [i[0] for i in golombs]
-        compressed = compressed + [binary(b)] + remainders + unaries 
+        remainders.append([binary(i[1]) for i in golombs])
+        unaries.append([i[0] for i in golombs])
+        binaries.append(binary(b))
+    compressed = np.concatenate((binaries, remainders, unaries), axis = None) 
     return compressed
     
 def bit_difference(buffer_length, data, scheme):
@@ -98,6 +100,7 @@ def bit_difference(buffer_length, data, scheme):
     else:
         raise Exception("Please supply an encoding scheme")
     compression_ratio = (1 - compressed_bits/incoming_bits) *100
+    #compression_ratio = incoming_bits/compressed_bits
     return compression_ratio
 
 
@@ -117,20 +120,29 @@ fixed_data = fix_data(data)
 #%%
 start = time.time()
 #print(bit_difference(50, fixed_data[0], "delta"))
-delta_data(100, fixed_data[0], squared=False)
+print(bit_difference(10, fixed_data[0], "delta"))
 end = time.time()
 
 time_taken = end-start
 print(f'Time taken for compression : {time_taken}s')
 
-data = load_data(DATA_PATH)
-fixed_data = fix_data(data)
+#data = load_data(DATA_PATH)
+#fixed_data = fix_data(data)
 #%%
 #use bin() function to get binary equivalent - then use len ti find out # of bits
 #any reason deltas + golomb can't be used?
 #need to implement binary/huffman encoding for remainder of golob
+start = time.time()
+#print(bit_difference(50, fixed_data[0], "delta"))
+print(bit_difference(100, fixed_data[0], "golomb"))
+end = time.time()
 
-print(bit_difference(100, fixed_data[1], "golomb"))
+time_taken = end-start
+print(f'Time taken for compression : {time_taken}s')
+
+
+
+#print(bit_difference(100, fixed_data[0], "golomb"))
 #print(delta_data(100, fixed_data[0], squared=False)[-1])
 #print(golomb(100, fixed_data[0])[:4])
 
