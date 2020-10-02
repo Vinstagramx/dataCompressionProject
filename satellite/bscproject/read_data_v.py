@@ -107,7 +107,28 @@ def bit_difference(buffer_length, data, scheme):
     compression_ratio = (1 - compressed_bits/incoming_bits) *100
     return compression_ratio
 
+def vary_buffer_size(scheme, data, min_max = (1,200)):
+    buffer_sizes = range(min_max[0], min_max[1])
+    ratios = []
+    times = []
+    for i in buffer_sizes:
+        start = time.time()
+        ratios.append(bit_difference(i, data, scheme))
+        end = time.time()
+        times.append(end-start)
+    return buffer_sizes, ratios, times
 
+def plot(x, y, label, ylabel):
+    plt.plot(x, y, label = label)
+#    plt.plot(p,s1,'o', color = 'mediumslateblue')
+    #pl.xlim(0.391,0.414)
+    #pl.ylim(top=1035500)
+    #pl.xlim(left=1.478)
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
+    plt.ylabel(ylabel, fontsize = 22)
+    plt.xlabel("Block Size (number of readings)", fontsize = 22)
+    
 """
 When using the fixed_data array:
 fixed_data[0], [1], [2] = x,y,z magnetic field reading
@@ -121,18 +142,69 @@ data = load_data(PATH)
 #%%
 fixed_data = fix_data(data)
 
+
 #%%
-start = time.time()
-#print(bit_difference(50, fixed_data[0], "delta"))
-#delta_data(100, fixed_data[0], squared=False)
-#compressed_data = golomb(100, fixed_data[0])
-compressed_data = delta_data(10, fixed_data[0], squared = False)
-end = time.time()
+#"""
+#Plotting compression ratios/times
+#"""
+#
+#figure = plt.gcf()  # get current figure
+#figure.set_size_inches(18, 10)
+#
+#xdelta = vary_buffer_size("delta", fixed_data[0])
+#ydelta = vary_buffer_size("delta", fixed_data[1])
+#zdelta = vary_buffer_size("delta", fixed_data[2])
+#
+#plot(xdelta[0], xdelta[1], label = 'x-direction', ylabel = "Compression Ratio (%)")
+#plot(zdelta[0], zdelta[1], label = 'z-direction', ylabel = "Compression Ratio (%)")
+#plot(ydelta[0], ydelta[1], label = 'y-direction', ylabel = "Compression Ratio (%)")
+#plt.title('Compression Ratio vs Block Size (Delta)', fontsize = 24)
+#plt.legend()
+#plt.savefig('compratio_blocksize_delta.png', dpi = 200)
+#
+#plt.clf()
+#plot(xdelta[0], xdelta[2], label = 'x-direction', ylabel = "Compression Time (s)")
+#plot(zdelta[0], zdelta[2], label = 'z-direction', ylabel = "Compression Time (s)")
+#plot(ydelta[0], ydelta[2], label = 'y-direction', ylabel = "Compression Time (s)")
+#plt.legend()
+#plt.title('Compression Time vs Block Size (Delta)', fontsize = 24)
+#plt.savefig('comptime_blocksize_delta.png', dpi = 200)
 
-time_taken = end-start
-print(f'Time taken for compression : {time_taken}s')
+plt.clf()
+xgolomb = vary_buffer_size("golomb", fixed_data[0])
+ygolomb = vary_buffer_size("golomb", fixed_data[1])
+zgolomb = vary_buffer_size("golomb", fixed_data[2])
 
-print(bit_difference(10, fixed_data[0], "delta"))
+plot(xgolomb[0], xgolomb[1], label = 'x-direction', ylabel = "Compression Ratio (%)")
+plot(ygolomb[0], ygolomb[1], label = 'y-direction', ylabel = "Compression Ratio (%)")
+plot(zgolomb[0], zgolomb[1], label = 'z-direction', ylabel = "Compression Ratio (%)")
+plt.legend()
+plt.title('Compression Ratio vs Block Size (Golomb)', fontsize = 24)
+plt.savefig('compratio_blocksize_golomb.png', dpi = 200)
+
+plt.clf()
+plot(xgolomb[0], xgolomb[2], label = 'x-direction', ylabel = "Compression Time (s)")
+plot(ygolomb[0], ygolomb[2], label = 'y-direction', ylabel = "Compression Time (s)")
+plot(zgolomb[0], zgolomb[2], label = 'z-direction', ylabel = "Compression Time (s)")
+plt.legend()
+plt.title('Compression Time vs Block Size (Golomb)', fontsize = 24)
+plt.savefig('comptime_blocksize_golomb.png', dpi = 200)
+
+#%%
+"""
+Testing compression schemes
+"""
+#start = time.time()
+##print(bit_difference(50, fixed_data[0], "delta"))
+##delta_data(100, fixed_data[0], squared=False)
+##compressed_data = golomb(100, fixed_data[0])
+#compressed_data = delta_data(10, fixed_data[0], squared = False)
+#end = time.time()
+#
+#time_taken = end-start
+#print(f'Time taken for compression : {time_taken}s')
+#
+#print(bit_difference(10, fixed_data[0], "delta"))
 #%%
 #use bin() function to get binary equivalent - then use len ti find out # of bits
 #any reason deltas + golomb can't be used?
