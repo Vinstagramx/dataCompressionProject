@@ -7,6 +7,13 @@ Created on Thu Oct  1 12:05:08 2020
 import numpy as np
 import matplotlib.pyplot as plt
 
+import time
+import os
+
+cwd = os.getcwd()
+parent = os.path.dirname(cwd)
+PATH = os.path.join(parent, 'bscproject', 'C1_160308.FS.FULLRES.txt')
+
 
 DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
 
@@ -92,14 +99,19 @@ def bit_difference(buffer_length, data, scheme):
     compression_ratio = incoming_bits/compressed_bits
     return compression_ratio
 
-
+start = time.time()
 
 #use bin() function to get binary equivalent - then use len ti find out # of bits
 #any reason deltas + golomb can't be used?
 #need to implement binary/huffman encoding for remainder of golob
-data = load_data(DATA_PATH)
+data = load_data(PATH)
 fixed_data = fix_data(data)
 print(bit_difference(50, fixed_data[0], "delta"))
+
+end = time.time()
+
+time_taken = end-start
+print(f'Time taken for compression : {time_taken}s')
 #print(delta_data(100, fixed_data[0], squared=False)[-1])
 #print(golomb(100, fixed_data[0])[:4])
 
