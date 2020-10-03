@@ -32,6 +32,11 @@ def fix_data(data):
     fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32)
     return fixed_array
 
+def get_fixed_data():
+    data = load_data(PATH)
+    fixed = fix_data(data)
+    return fixed
+
 def binary(decimal):
     """
     Might need to change this depending on how we're actually meant to reverse/
@@ -109,7 +114,7 @@ def vary_buffer_size(scheme, data, min_max = (1,100)):
     for i in buffer_sizes:
         print(i)
         ratios.append(bit_difference(i, data, scheme))
-    plt.plot(buffer_sizes, ratios)
+    return (buffer_sizes, ratios)
 
 
 
@@ -122,19 +127,19 @@ fixed_data[0], [1], [2] = x,y,z magnetic field reading
 #use bin() function to get binary equivalent - then use len ti find out # of bits
 #any reason deltas + golomb can't be used?
 #need to implement binary/huffman encoding for remainder of golob
-data = load_data(PATH)
+#data = load_data(PATH)
 
 #%%
-fixed_data = fix_data(data)
+#fixed_data = fix_data(data)
 
-#%%
-start = time.time()
+#%%#
+#start = time.time()
 #print(bit_difference(50, fixed_data[0], "delta"))
-print(bit_difference(10, fixed_data[0], "delta"))
-end = time.time()
+#print(bit_difference(10, fixed_data[0], "delta"))
+#end = time.time()
 
-time_taken = end-start
-print(f'Time taken for compression : {time_taken}s')
+#time_taken = end-start
+#print(f'Time taken for compression : {time_taken}s')
 
 #data = load_data(DATA_PATH)
 #fixed_data = fix_data(data)
@@ -142,16 +147,17 @@ print(f'Time taken for compression : {time_taken}s')
 #use bin() function to get binary equivalent - then use len ti find out # of bits
 #any reason deltas + golomb can't be used?
 #need to implement binary/huffman encoding for remainder of golob
-start = time.time()
+#start = time.time()
 #print(bit_difference(50, fixed_data[0], "delta"))
-print(bit_difference(100, fixed_data[0], "golomb"))
-end = time.time()
+#print(bit_difference(100, fixed_data[0], "golomb"))
+#end = time.time()
 
-time_taken = end-start
-print(f'Time taken for compression : {time_taken}s')
+#time_taken = end-start
+#print(f'Time taken for compression : {time_taken}s')
 
 #%%
-vary_buffer_size("golomb", fixed_data[0], (1, 100))
+#delta_size = vary_buffer_size("delta", fixed_data[0], (1, 100))
+#golomb_size = vary_buffer_size("golomb", fixed_data[0], (1, 100))
 
 
 #print(bit_difference(100, fixed_data[0], "golomb"))
