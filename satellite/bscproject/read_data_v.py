@@ -73,21 +73,18 @@ def golomb_encoding(n,b):
 
 def golomb(buffer_length, data_list, rice = False):
     buffer_regions = [i*buffer_length for i in range(0, len(data_list)//buffer_length)]
-    binaries = []
-    remainders = []
-    unaries = []
+    unaries, binaries, remainders = [], [], []
     for buffer_start in buffer_regions:
-#        print(buffer_start)
+        #print(buffer_start)
         data = data_list[buffer_start:(buffer_start+buffer_length)]
         b = int(np.mean(data))
         golombs = [golomb_encoding(i, b) for i in data]
-        remainders.append([binary(i[1]) for i in golombs])
-        unaries.append([i[0] for i in golombs])
-        binaries.append(binary(b))
-        
-    compressed = np.concatenate((binaries, remainders, unaries), axis = None)
-#        compressed = compressed + [binary(b)] + remainders + unaries 
+        remainders.append([len(binary(i[1])) for i in golombs])
+        unaries.append([len(i[0]) for i in golombs])
+        binaries.append(len(binary(b)))
+    compressed = np.concatenate((binaries, remainders, unaries), axis = None) 
     return compressed
+
     
 def bit_difference(buffer_length, data, scheme):
     """
@@ -101,7 +98,7 @@ def bit_difference(buffer_length, data, scheme):
         compressed_bits = sum([len(binary(i)) for i in compressed])
     elif scheme == "golomb":
         compressed = golomb(buffer_length, data)
-        compressed_bits = sum([len(i) for i in compressed])
+        compressed_bits = sum(compressed)
     else:
         raise Exception("Please supply an encoding scheme")
     compression_ratio = (1 - compressed_bits/incoming_bits) *100
