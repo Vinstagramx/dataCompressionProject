@@ -145,47 +145,47 @@ fixed_data = fix_data(data)
 #Plotting compression ratios/times
 #"""
 #
-#figure = plt.gcf()  # get current figure
-#figure.set_size_inches(18, 10)
+figure = plt.gcf()  # get current figure
+figure.set_size_inches(18, 10)
+
+xdelta = vary_buffer_size("delta", fixed_data[0])
+ydelta = vary_buffer_size("delta", fixed_data[1])
+zdelta = vary_buffer_size("delta", fixed_data[2])
+
+plot(xdelta[0], xdelta[1], label = 'x-direction', ylabel = "Compression Ratio (%)")
+plot(ydelta[0], ydelta[1], label = 'y-direction', ylabel = "Compression Ratio (%)")
+plot(zdelta[0], zdelta[1], label = 'z-direction', ylabel = "Compression Ratio (%)")
+plt.title('Compression Ratio vs Block Size (Delta)', fontsize = 24)
+plt.legend()
+plt.savefig('compratio_blocksize_delta2.png', dpi = 200)
+
+plt.clf()
+plot(xdelta[0], xdelta[2], label = 'x-direction', ylabel = "Compression Time (s)")
+plot(ydelta[0], ydelta[2], label = 'y-direction', ylabel = "Compression Time (s)")
+plot(zdelta[0], zdelta[2], label = 'z-direction', ylabel = "Compression Time (s)")
+plt.legend()
+plt.title('Compression Time vs Block Size (Delta)', fontsize = 24)
+plt.savefig('comptime_blocksize_delta.png', dpi = 200)
+
+#plt.clf()
+#xgolomb = vary_buffer_size("golomb", fixed_data[0])
+#ygolomb = vary_buffer_size("golomb", fixed_data[1])
+#zgolomb = vary_buffer_size("golomb", fixed_data[2])
 #
-#xdelta = vary_buffer_size("delta", fixed_data[0])
-#ydelta = vary_buffer_size("delta", fixed_data[1])
-#zdelta = vary_buffer_size("delta", fixed_data[2])
-#
-#plot(xdelta[0], xdelta[1], label = 'x-direction', ylabel = "Compression Ratio (%)")
-#plot(zdelta[0], zdelta[1], label = 'z-direction', ylabel = "Compression Ratio (%)")
-#plot(ydelta[0], ydelta[1], label = 'y-direction', ylabel = "Compression Ratio (%)")
-#plt.title('Compression Ratio vs Block Size (Delta)', fontsize = 24)
+#plot(xgolomb[0], xgolomb[1], label = 'x-direction', ylabel = "Compression Ratio (%)")
+#plot(ygolomb[0], ygolomb[1], label = 'y-direction', ylabel = "Compression Ratio (%)")
+#plot(zgolomb[0], zgolomb[1], label = 'z-direction', ylabel = "Compression Ratio (%)")
 #plt.legend()
-#plt.savefig('compratio_blocksize_delta.png', dpi = 200)
+#plt.title('Compression Ratio vs Block Size (Golomb)', fontsize = 24)
+#plt.savefig('compratio_blocksize_golomb.png', dpi = 200)
 #
 #plt.clf()
-#plot(xdelta[0], xdelta[2], label = 'x-direction', ylabel = "Compression Time (s)")
-#plot(zdelta[0], zdelta[2], label = 'z-direction', ylabel = "Compression Time (s)")
-#plot(ydelta[0], ydelta[2], label = 'y-direction', ylabel = "Compression Time (s)")
+#plot(xgolomb[0], xgolomb[2], label = 'x-direction', ylabel = "Compression Time (s)")
+#plot(ygolomb[0], ygolomb[2], label = 'y-direction', ylabel = "Compression Time (s)")
+#plot(zgolomb[0], zgolomb[2], label = 'z-direction', ylabel = "Compression Time (s)")
 #plt.legend()
-#plt.title('Compression Time vs Block Size (Delta)', fontsize = 24)
-#plt.savefig('comptime_blocksize_delta.png', dpi = 200)
-
-plt.clf()
-xgolomb = vary_buffer_size("golomb", fixed_data[0])
-ygolomb = vary_buffer_size("golomb", fixed_data[1])
-zgolomb = vary_buffer_size("golomb", fixed_data[2])
-
-plot(xgolomb[0], xgolomb[1], label = 'x-direction', ylabel = "Compression Ratio (%)")
-plot(ygolomb[0], ygolomb[1], label = 'y-direction', ylabel = "Compression Ratio (%)")
-plot(zgolomb[0], zgolomb[1], label = 'z-direction', ylabel = "Compression Ratio (%)")
-plt.legend()
-plt.title('Compression Ratio vs Block Size (Golomb)', fontsize = 24)
-plt.savefig('compratio_blocksize_golomb.png', dpi = 200)
-
-plt.clf()
-plot(xgolomb[0], xgolomb[2], label = 'x-direction', ylabel = "Compression Time (s)")
-plot(ygolomb[0], ygolomb[2], label = 'y-direction', ylabel = "Compression Time (s)")
-plot(zgolomb[0], zgolomb[2], label = 'z-direction', ylabel = "Compression Time (s)")
-plt.legend()
-plt.title('Compression Time vs Block Size (Golomb)', fontsize = 24)
-plt.savefig('comptime_blocksize_golomb.png', dpi = 200)
+#plt.title('Compression Time vs Block Size (Golomb)', fontsize = 24)
+#plt.savefig('comptime_blocksize_golomb.png', dpi = 200)
 
 #%%
 """
