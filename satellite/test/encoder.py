@@ -5,7 +5,9 @@ Created on Mon Oct  5 17:55:18 2020
 @author: Ronan
 """
 import numpy as np
+from scipy import stats
 import random 
+import matplotlib.pyplot as plt
 
 class Encoder(object):
     def __init__(self, PATH, block_size=10, samples="all", direction ="x"):
@@ -15,6 +17,8 @@ class Encoder(object):
         directions = ["x", "y", "z"]
         self._current_data = self._data[directions.index(direction)]  #filter to x,y,z only
         self._block_regions = self.gen_samples(samples)
+        self._lengths_distribution = []
+        self._lengths_stats = []
        
     def load_data(self, path):
         data = np.loadtxt(path).T
@@ -22,7 +26,7 @@ class Encoder(object):
         fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32)
         return fixed_array
     
-    def gen_samples(self, samples, seed=1):
+    def gen_samples(self, samples, seed=2):
         """
         Get list of starts of blocks from block_siz and data length, then choose samples randomly with a given seed.
         Returns list of indices that are starts of blocks.
@@ -71,6 +75,20 @@ class Encoder(object):
                 trunc_block.append(data)
         return trunc_block
                 
+    def block_stats(self, lengths_block):
+        """
+        Look at a bunch of properties of list of bit lengths: max, min, mean, mode
+        and adds the lengths to dist list for plotting later.
+        """
+        maximum = np.max(lengths_block); minimum = np.min(lengths_block)
+        mean = np.mean(lengths_block); mode = stats.mode(lengths_block)
+        self._lengths_distribution = self._lengths_distribution + lengths_block
+        self._lengths_stats.append([maximum, minimum, mean, mode])
+        return 0
+    
+    def plot_block_stats(self):
+        plt.hist(self._lengths_distribution)
+
     def encode_data(self):
         """
         High level function meant to represent a generic encoding process so 
@@ -83,13 +101,12 @@ class Encoder(object):
         for block_start in block_regions:
             block = self._current_data[block_start:(block_start+self._block_size)]
             encoded_block = self.encode(block)[1] #encode(block)[0] is the codeword, [1] the data encoded by codeword
-            print(encoded_block)
             lengths = self.get_block_bit_lengths(encoded_block)
             #do some stats on encoded block in here
+            self.block_stats(lengths)
             #trunc_block = self.truncate(encoded_block, lengths)
-            biggest_int = max(lengths)
-            print(biggest_int)
             #compressed.append(encoded_block)
+        self.plot_block_stats()
         return self._new_data
     
 class Delta(Encoder):
@@ -117,14 +134,7 @@ class Golomb(Encoder):
         b = int(np.mean(block))
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
-        print(type(data))
         return (b, data)
     
-#%%
-DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
 
-d = Delta(DATA_PATH, 10, 100)
-
-#%%
-d.encode_data()
             
