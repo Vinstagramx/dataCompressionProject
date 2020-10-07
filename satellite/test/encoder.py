@@ -19,6 +19,8 @@ class Encoder(object):
         self._block_regions = self.gen_samples(samples)
         self._lengths_distribution = []
         self._lengths_stats = []
+        self._original_bit_length = 0
+        self._encoded_bit_length = 0
        
     def load_data(self, path):
         data = np.loadtxt(path).T
@@ -87,16 +89,27 @@ class Encoder(object):
         return 0
     
     def plot_block_stats(self):
-        fig, axs = plt.subplots(3,2)
-        data = np.asarray(self._lengths_stats).T
+        fig, axs = plt.subplots(2,2)
+        stats_data = np.asarray(self._lengths_stats).T
+        data = [self._lengths_distribution] + [list(i) for i in stats_data]
         print(data)
-        axs[0,0].hist(self._lengths_distribution)
-        axs[1,0].hist(data[0], bins="auto")
-        axs[2,0].hist(data[1], bins = 4)
-        axs[0,1].hist(data[2], bins = 7)
-        axs[1,1].hist(data[3], bins = "rice")
-
-    def encode_data(self):
+        ax_tag_color = [(axs[0,0], "", "blue"), (axs[1,0], "Max ", "green"), (axs[0,1], "Min ", "orange"), (axs[1,1],"Mean ", "red")]
+        for index, i in enumerate(ax_tag_color):
+            print(index)
+            i[0].hist(data[index], color=i[2])
+            i[0].set_title(i[1]+"Bit Lengths in Block")
+        
+    def get_compression_ratio(self):
+        ratio = (1-self._encoded_bit_length/self._original_bit_length)*100
+        print(ratio)
+        return ratio
+        
+    def update_bit_diff(self, codeword, orig_block, encoded_block):
+        self._original_bit_length += sum(self.get_block_bit_lengths(orig_block))
+        self._encoded_bit_length += sum(self.get_block_bit_lengths(encoded_block)) + codeword
+        return 0
+    
+    def encode_data(self, ratio=True, stats=True):
         """
         High level function meant to represent a generic encoding process so 
         stuff like stats and plots can be easily created. Will require that 
@@ -107,13 +120,18 @@ class Encoder(object):
         block_regions = self._block_regions
         for block_start in block_regions:
             block = self._current_data[block_start:(block_start+self._block_size)]
-            encoded_block = self.encode(block)[1] #encode(block)[0] is the codeword, [1] the data encoded by codeword
-            lengths = self.get_block_bit_lengths(encoded_block)
-            #do some stats on encoded block in here
-            self.block_stats(lengths)
-            #trunc_block = self.truncate(encoded_block, lengths)
-            #compressed.append(encoded_block)
-        self.plot_block_stats()
+            encoded_data = self.encode(block)
+            encoded_block = encoded_data[1] #encode(block)[0] is the codeword, [1] the data encoded by codeword
+            if stats:
+                lengths = self.get_block_bit_lengths(encoded_block)
+                self.block_stats(lengths)   
+            if ratio:
+                codeword_length = self.get_block_bit_lengths([encoded_data[0]])[0]
+                self.update_bit_diff(codeword_length, block, encoded_block) #change this when golomb breaks!!
+        if ratio:
+            self.get_compression_ratio()
+        if stats:
+            self.plot_block_stats()
         return self._new_data
     
 class Delta(Encoder):
@@ -124,7 +142,7 @@ class Delta(Encoder):
     def encode(self, block):
         ref_point = block[0]
         compressed = [(i- ref_point) for i in block[1:]]
-        return (ref_point, compressed)
+        return [ref_point, compressed]
 
 class DeltaSq(Encoder):
     """
@@ -136,7 +154,7 @@ class DeltaSq(Encoder):
         compressed = [(i- ref_point) for i in block[1:]]
         delta_ref = compressed[0]
         compressed2 = [(i- delta_ref) for i in compressed[1:]]
-        return ((ref_point, delta_ref), compressed2)
+        return [[ref_point, delta_ref], compressed2]
 
 class Golomb(Encoder):
     """
@@ -153,7 +171,7 @@ class Golomb(Encoder):
         b = int(np.mean(block))
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
-        return (b, data)
+        return [b, data]
     
 
             
