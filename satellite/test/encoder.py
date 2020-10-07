@@ -87,7 +87,14 @@ class Encoder(object):
         return 0
     
     def plot_block_stats(self):
-        plt.hist(self._lengths_distribution)
+        fig, axs = plt.subplots(3,2)
+        data = np.asarray(self._lengths_stats).T
+        print(data)
+        axs[0,0].hist(self._lengths_distribution)
+        axs[1,0].hist(data[0], bins="auto")
+        axs[2,0].hist(data[1], bins = 4)
+        axs[0,1].hist(data[2], bins = 7)
+        axs[1,1].hist(data[3], bins = "rice")
 
     def encode_data(self):
         """
