@@ -89,6 +89,7 @@ class Encoder(object):
         return 0
     
     def plot_block_stats(self):
+        plt.figure("Block Stats Plots")
         fig, axs = plt.subplots(2,2)
         stats_data = np.asarray(self._lengths_stats).T
         data = [self._lengths_distribution] + [list(i) for i in stats_data]
@@ -101,7 +102,7 @@ class Encoder(object):
         
     def get_compression_ratio(self):
         ratio = (1-self._encoded_bit_length/self._original_bit_length)*100
-        print(ratio)
+        #print(ratio)
         return ratio
         
     def update_bit_diff(self, codeword, orig_block, encoded_block):
