@@ -128,7 +128,7 @@ class Delta(Encoder):
 
 class DeltaSq(Encoder):
     """
-    Inherited class of Encoder with delta encoding implementation overriding
+    Inherited class of Encoder with delta squared encoding implementation overriding
     encode().
     """      
     def encode(self, block):
@@ -136,7 +136,7 @@ class DeltaSq(Encoder):
         compressed = [(i- ref_point) for i in block[1:]]
         delta_ref = compressed[0]
         compressed2 = [(i- delta_ref) for i in compressed[1:]]
-        return (ref_point, delta_ref, compressed2)
+        return ((ref_point, delta_ref), compressed2)
 
 class Golomb(Encoder):
     """
