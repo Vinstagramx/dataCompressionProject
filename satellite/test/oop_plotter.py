@@ -9,11 +9,16 @@ import matplotlib.pyplot as plt
 from encoder import Delta, Golomb
 import numpy as np
 
+plt.clf()
+figure = plt.gcf()  # get current figure
+figure.set_size_inches(18, 10)
+
 def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
     plt.xlabel(x_label,fontsize=fontsize)
     plt.title(title,fontsize=fontsize)
     plt.ylabel(y_label,fontsize=fontsize) 
     plt.tick_params(labelsize=fontsize)
+    plt.legend()
 
 #%%
 DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
