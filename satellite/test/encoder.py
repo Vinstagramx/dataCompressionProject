@@ -93,16 +93,16 @@ class Encoder(object):
         fig, axs = plt.subplots(2,2)
         stats_data = np.asarray(self._lengths_stats).T
         data = [self._lengths_distribution] + [list(i) for i in stats_data]
-        print(data)
+        #print(data)
         ax_tag_color = [(axs[0,0], "", "blue"), (axs[1,0], "Max ", "green"), (axs[0,1], "Min ", "orange"), (axs[1,1],"Mean ", "red")]
         for index, i in enumerate(ax_tag_color):
-            print(index)
+            #print(index)
             i[0].hist(data[index], color=i[2])
             i[0].set_title(i[1]+"Bit Lengths in Block")
         
     def get_compression_ratio(self):
         ratio = (1-self._encoded_bit_length/self._original_bit_length)*100
-        #print(ratio)
+        print(ratio)
         return ratio
         
     def update_bit_diff(self, codeword, orig_block, encoded_block):
@@ -123,6 +123,7 @@ class Encoder(object):
             block = self._current_data[block_start:(block_start+self._block_size)]
             encoded_data = self.encode(block)
             encoded_block = encoded_data[1] #encode(block)[0] is the codeword, [1] the data encoded by codeword
+            print(encoded_block)
             if stats:
                 lengths = self.get_block_bit_lengths(encoded_block)
                 self.block_stats(lengths)   
@@ -141,8 +142,11 @@ class Delta(Encoder):
     encode().
     """      
     def encode(self, block):
-        ref_point = block[0]
-        compressed = [(i- ref_point) for i in block[1:]]
+        ref_point = block[0]; compressed = []
+        #compressed.append(ref_point)
+        for i in range(1,len(block)):
+            compressed.append(block[i]-block[i-1])
+        #compressed = [(i- ref_point) for i in block[1:]]
         return [ref_point, compressed]
 
 class DeltaSq(Encoder):

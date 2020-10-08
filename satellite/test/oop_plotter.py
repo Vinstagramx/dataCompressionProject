@@ -18,7 +18,7 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 #%%
 DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
 
-d = Delta(DATA_PATH, 9, 100)
+d = Delta(DATA_PATH, 11, 100)
 
 #%%
 d.encode_data()
@@ -39,6 +39,7 @@ for i in range(2, 100, 2):
     temp_encoder = Delta(DATA_PATH, i, 100, direction="y")
     temp_encoder.encode_data(stats=False)
     ratios.append(temp_encoder.get_compression_ratio())
+#%%
 plt.figure("Compression ratios")
-plt.plot(range(len(ratios), 2), ratios)
+plt.plot(range(2, 100, 2), ratios)
 pretty_graph("Block size", "Compression Ratio", "Compression Ratio vs Block size", 20)
