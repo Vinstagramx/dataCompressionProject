@@ -18,7 +18,7 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 #%%
 DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
 
-d = Delta(DATA_PATH, 11, 100)
+d = Delta(DATA_PATH, 20, 1000, direction="x")
 
 #%%
 d.encode_data()
