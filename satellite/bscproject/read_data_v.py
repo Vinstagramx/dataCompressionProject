@@ -13,7 +13,8 @@ import os
 cwd = os.getcwd()
 parent = os.path.dirname(cwd)
 #PATH = os.path.join(parent, 'bscproject', 'C1_160308.FS.FULLRES.txt')
-PATH = os.path.join(cwd, 'C1_160308.FS.FULLRES.txt')
+# PATH = os.path.join(cwd, 'C1_160308.FS.FULLRES.txt')
+PATH = "/Users/vwong/Documents/GitHub/Physics2020/satellite/bscproject/C1_160308.FS.FULLRES.txt"
 
 
 DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
@@ -52,6 +53,13 @@ def delta_encoding(data):
     compressed = [(i- ref_point) for i in data[1:]]
     return [ref_point] + compressed
 
+def delta2_encoding(data):
+    ref_point = data[0]
+    compressed = [(i- ref_point) for i in data[1:]]
+    delta_ref = compressed[0]
+    compressed2 = [(i- delta_ref) for i in compressed[1:]]
+    return [ref_point] + [delta_ref] + compressed2
+
 def delta_data(buffer_length, data_list, squared = False):
     buffer_regions = [i*buffer_length for i in range(0, len(data_list)//buffer_length)]
     compressed = []
@@ -62,6 +70,14 @@ def delta_data(buffer_length, data_list, squared = False):
             compressed.append(delta_squared)
         else:
             compressed.append(deltas) #edited for ease of use w/ bit_difference()
+    compressed = np.ndarray.flatten(np.asarray(compressed))
+    return compressed
+
+def delta2(buffer_length, data_list):
+    buffer_regions = [i*buffer_length for i in range(0, len(data_list)//buffer_length)]
+    compressed = []
+    for buffer_start in buffer_regions:
+        deltas = delta2_encoding(data_list[buffer_start:(buffer_start+buffer_length)])
     compressed = np.ndarray.flatten(np.asarray(compressed))
     return compressed
             
@@ -99,12 +115,15 @@ def bit_difference(buffer_length, data, scheme):
     elif scheme == "golomb":
         compressed = golomb(buffer_length, data)
         compressed_bits = sum(compressed)
+    elif scheme == 'delta2':
+        compressed = delta2(buffer_length, data)
+        compressed_bits = sum([len(binary(i)) for i in compressed])
     else:
         raise Exception("Please supply an encoding scheme")
     compression_ratio = (1 - compressed_bits/incoming_bits) *100
     return compression_ratio
 
-def vary_buffer_size(scheme, data, min_max = (1,200)):
+def vary_buffer_size(scheme, data, min_max = (2,200)):
     buffer_sizes = range(min_max[0], min_max[1])
     ratios = []
     times = []
@@ -145,27 +164,30 @@ fixed_data = fix_data(data)
 #Plotting compression ratios/times
 #"""
 #
+plt.clf()
 figure = plt.gcf()  # get current figure
 figure.set_size_inches(18, 10)
 
-xdelta = vary_buffer_size("delta", fixed_data[0])
-ydelta = vary_buffer_size("delta", fixed_data[1])
-zdelta = vary_buffer_size("delta", fixed_data[2])
+xdelta = vary_buffer_size("delta2", fixed_data[0])
+ydelta = vary_buffer_size("delta2", fixed_data[1])
+zdelta = vary_buffer_size("delta2", fixed_data[2])
 
 plot(xdelta[0], xdelta[1], label = 'x-direction', ylabel = "Compression Ratio (%)")
 plot(ydelta[0], ydelta[1], label = 'y-direction', ylabel = "Compression Ratio (%)")
 plot(zdelta[0], zdelta[1], label = 'z-direction', ylabel = "Compression Ratio (%)")
-plt.title('Compression Ratio vs Block Size (Delta)', fontsize = 24)
+plt.title('Compression Ratio vs Block Size (Delta-of-delta)', fontsize = 24)
 plt.legend()
-plt.savefig('compratio_blocksize_delta2.png', dpi = 200)
+plt.savefig('compratio_blocksize_deltasq.png', dpi = 200)
 
 plt.clf()
+figure = plt.gcf()  # get current figure
+figure.set_size_inches(18, 10)
 plot(xdelta[0], xdelta[2], label = 'x-direction', ylabel = "Compression Time (s)")
 plot(ydelta[0], ydelta[2], label = 'y-direction', ylabel = "Compression Time (s)")
 plot(zdelta[0], zdelta[2], label = 'z-direction', ylabel = "Compression Time (s)")
 plt.legend()
 plt.title('Compression Time vs Block Size (Delta)', fontsize = 24)
-plt.savefig('comptime_blocksize_delta.png', dpi = 200)
+plt.savefig('comptime_blocksize_deltasq.png', dpi = 200)
 
 #plt.clf()
 #xgolomb = vary_buffer_size("golomb", fixed_data[0])
