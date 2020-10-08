@@ -34,12 +34,12 @@ for index, i  in enumerate(raw_data):
     pretty_graph("Time (s)", "Magnetic Field (nT)", "Magnetic field as function of time", 20)
 #%%
 ratios = []
-for i in range(2, 100, 2):
+for i in range(2, 100, 1):
     print(i)
-    temp_encoder = Delta(DATA_PATH, i, 100, direction="y")
+    temp_encoder = Delta(DATA_PATH, i, 100, direction="z")
     temp_encoder.encode_data(stats=False)
     ratios.append(temp_encoder.get_compression_ratio())
 #%%
 plt.figure("Compression ratios")
-plt.plot(range(2, 100, 2), ratios)
-pretty_graph("Block size", "Compression Ratio", "Compression Ratio vs Block size", 20)
+plt.plot(range(2, 100, 1), ratios, color="green")
+pretty_graph("Block size", "Compression Ratio", "Delta Compression Ratio vs Block size in z direction", 20)
