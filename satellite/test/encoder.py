@@ -106,8 +106,17 @@ class Encoder(object):
         return ratio
         
     def update_bit_diff(self, codeword, orig_block, encoded_block):
-        self._original_bit_length += sum(self.get_block_bit_lengths(orig_block))
-        self._encoded_bit_length += sum(self.get_block_bit_lengths(encoded_block)) + codeword
+        """
+        Adjusted slightly. Updates the class variables that track the running totals
+        of bit lengths in unencoded and encoded blocks. Now just multiplies the 
+        length of block by the maximum bit length in the block (because this 
+        is how it will be on sub satellite.)
+        """
+        #self._original_bit_length += sum(self.get_block_bit_lengths(orig_block))
+        self._original_bit_length += 14*len(orig_block)
+        max_bit_length = max(self.get_block_bit_lengths(encoded_block))
+        #self._encoded_bit_length += sum(self.get_block_bit_lengths(encoded_block)) + codeword
+        self._encoded_bit_length += max_bit_length*len(encoded_block) + codeword
         return 0
     
     def encode_data(self, ratio=True, stats=True):

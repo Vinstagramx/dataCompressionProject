@@ -39,7 +39,7 @@ for index, i  in enumerate(raw_data):
     pretty_graph("Time (s)", "Magnetic Field (nT)", "Magnetic field as function of time", 20)
 #%%
 ratios = []
-for i in range(2, 100, 1):
+for i in range(2, 1000, 1):
     print(i)
     temp_encoder = Delta(DATA_PATH, i, 100, direction="z")
     temp_encoder.encode_data(stats=False)
