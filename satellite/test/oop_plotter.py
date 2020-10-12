@@ -4,7 +4,7 @@ Created on Tue Oct  6 16:39:32 2020
 
 @author: Ronan
 """
-
+import os
 import matplotlib.pyplot as plt
 from encoder import Delta, Golomb
 import numpy as np
