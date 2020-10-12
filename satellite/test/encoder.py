@@ -164,10 +164,12 @@ class DeltaSq(Encoder):
     encode().
     """      
     def encode(self, block):
-        ref_point = block[0]
-        compressed = [(i- ref_point) for i in block[1:]]
+        ref_point = block[0]; compressed, compressed2 = [], []
+        for i in range(1,len(block)):
+            compressed.append(block[i]-block[i-1])
         delta_ref = compressed[0]
-        compressed2 = [(i- delta_ref) for i in compressed[1:]]
+        for i in range(1,len(block)):
+            compressed2.append(compressed[i]-compressed[i-1])
         return [[ref_point, delta_ref], compressed2]
 
 class Golomb(Encoder):
