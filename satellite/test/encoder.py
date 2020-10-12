@@ -132,7 +132,7 @@ class Encoder(object):
             block = self._current_data[block_start:(block_start+self._block_size)]
             encoded_data = self.encode(block)
             encoded_block = encoded_data[1] #encode(block)[0] is the codeword, [1] the data encoded by codeword
-            print(encoded_block)
+            #print(encoded_block)
             if stats:
                 lengths = self.get_block_bit_lengths(encoded_block)
                 self.block_stats(lengths)   
