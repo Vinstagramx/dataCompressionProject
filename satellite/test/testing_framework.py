@@ -23,18 +23,15 @@ for filename in os.listdir(data_path):
     dirs = ["x", "y", "z"]
     for direction in dirs:
         ratios = []
-        #print(file_index, loop)
-        for i in range(2, 4, 1):
-            temp_encoder = Delta(data_path+"\\"+filename, i, 2, direction=direction)
+        print(file_index, loop)
+        for i in range(2, 100, 1):
+            temp_encoder = Delta(data_path+"\\"+filename, i, "all", direction=direction)
             temp_encoder.encode_data(stats=False)
             ratios.append(temp_encoder.get_compression_ratio())
         max_ratio = max(ratios); block_size = ratios.index(max_ratio) + 2
-        #print(max_ratio)
+        print(max_ratio)
         max_ratios.append(max_ratio)
         max_blocks.append(block_size)
-        loop += 1
-        print(max_ratios)
-        print(max_blocks)
 #%%
 csv["Delta"] = max_ratios
 csv["Block"] = max_blocks
