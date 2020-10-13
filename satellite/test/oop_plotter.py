@@ -21,9 +21,10 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
     plt.legend()
 
 #%%
-DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
+#DATA_PATH = "C:\\Users\\Ronan\\Documents\\uni_work\\physics\\third year\\project\\data\\test_data\\C1_160308.txt"
+DATA_PATH = "C:\\Users\\Ronan\\Documents\\github\\Physics2020\\satellite\\data\\C1_160313.FS.FULLRES.txt"
 
-d = Delta(DATA_PATH, 20, 1000, direction="x")
+d = Delta(DATA_PATH, 20, "all", direction="x")
 
 #%%
 d.encode_data()
@@ -41,7 +42,7 @@ for index, i  in enumerate(raw_data):
 ratios = []
 for i in range(2, 100, 2):
     print(i)
-    temp_encoder = Delta(DATA_PATH, i, 1000, direction="x")
+    temp_encoder = Delta(DATA_PATH, i, 1000, direction="z")
     temp_encoder.encode_data(stats=False)
     ratios.append(temp_encoder.get_compression_ratio())
 #%%
