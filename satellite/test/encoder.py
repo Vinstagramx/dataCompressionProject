@@ -53,6 +53,10 @@ class Encoder(object):
     def encode(self, block): #generic method to be overwritten by golomb and delta and others
         return block
     
+    def get_mean(self):
+        mean = np.mean(self._current_data)
+        return mean
+        
     def get_block_bit_lengths(self, block):
         """
         Returns list of the bit length of binary/unary whatever is in the block.
