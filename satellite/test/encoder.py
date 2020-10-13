@@ -14,6 +14,7 @@ class Encoder(object):
         self._block_size = block_size
         self._new_data =[]
         self._data = self.load_data(PATH)
+        self._direction = direction
         directions = ["x", "y", "z"]
         self._current_data = self._data[directions.index(direction)]  #filter to x,y,z only
         self._block_regions = self.gen_samples(samples)
@@ -102,7 +103,7 @@ class Encoder(object):
         
     def get_compression_ratio(self):
         ratio = (1-self._encoded_bit_length/self._original_bit_length)*100
-        print(ratio)
+        print(f'{self._direction}-compression ratio = {ratio}')
         return ratio
         
     def update_bit_diff(self, codeword, orig_block, encoded_block):
@@ -139,8 +140,8 @@ class Encoder(object):
             if ratio:
                 codeword_length = self.get_block_bit_lengths([encoded_data[0]])[0]
                 self.update_bit_diff(codeword_length, block, encoded_block) #change this when golomb breaks!!
-        if ratio:
-            self.get_compression_ratio()
+        # if ratio:
+            # self.get_compression_ratio()
         if stats:
             self.plot_block_stats()
         return self._new_data
