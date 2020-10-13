@@ -18,7 +18,7 @@ Working with a singular file
 '''
 
 parent_dir = os.path.dirname(cwd)
-datafile = 'C1_160308.FS.FULLRES.txt'
+datafile = 'C3_160313.FS.FULLRES.txt'
 DATA_PATH = os.path.join(cwd, 'data', datafile)
 plot_path = os.path.join(cwd, 'test', 'plots')
 plt.clf()
@@ -78,9 +78,9 @@ for i in range(2, 200, 2):
     zratios.append(ztemp_encoder.get_compression_ratio())
 #%%
 # plt.figure("Compression ratios")
-plt.plot(range(2, maxblocksize, step), xratios)
-plt.plot(range(2, maxblocksize, step), yratios)
-plt.plot(range(2, maxblocksize, step), zratios)
+plt.plot(range(2, maxblocksize, step), xratios, label = 'x-direction')
+plt.plot(range(2, maxblocksize, step), yratios, label = 'y-direction')
+plt.plot(range(2, maxblocksize, step), zratios, label = 'z-direction')
 plot_settings(None, filename)
 plt.savefig(f'{plot_path}/compression_ratio_xyz_{maxblocksize}_{filename}.png', dpi = 200)
 
