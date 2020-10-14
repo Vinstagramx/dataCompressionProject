@@ -14,13 +14,28 @@ import pandas as pd
 cwd = os.getcwd()
 cwd = os.path.dirname(cwd)
 data_folder = os.path.join(cwd, 'data')
-stats_file = os.path.join(cwd, 'test','stats.csv')
+stats_file = os.path.join(cwd, 'test','stats_prime.csv')
 #%% 
 data_path = data_folder
 csv = pd.read_csv(stats_file)
 loop = 0; max_ratios = []; max_blocks = []
 files = os.listdir(data_path)
+#%%
+means = []; stds = []
+for filename in files:
+    file_path = os.path.join(data_path, filename)
+    dirs = ["x", "y", "z"]
+    for direction in dirs:
+        temp_encoder = Delta(file_path, 100, "all", direction = direction)
+        mean = np.mean(temp_encoder._current_data)
+        means.append(mean)
+#%%
+csv["Means"] = [i/10000 for i in means]
+print(csv)
 
+
+
+#%%
 for filename in files[:6]:
     file_index = filename[:9]
     dirs = ["x", "y", "z"]
@@ -54,5 +69,6 @@ block_data = up_to_18_blocks + from_19_blocks
 
 csv["Delta"] = ratio_data
 csv["Block"] = block_data
+#%%
 csv.to_csv("stats_prime.csv")
 

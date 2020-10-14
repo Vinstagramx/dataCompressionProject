@@ -51,19 +51,18 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 # dz = Delta(DATA_PATH, 20, 'all', direction="x")
 
 #%%
-# time_interval = 0.14866719 #time interval between every reading (in seconds) - FIXED
-# raw_data = d._data
-# dirs = ["x-direction", "y-direction", "z-direction"]
-# for index, i  in enumerate(raw_data):
-#     std = np.std(i)
-#     print(dirs[index], " standard dev is: ", std)
-#     timeseries = np.asarray(range(len(i))) * time_interval
-#     maxval = max(timeseries)
-#     plt.plot(timeseries, i, label = dirs[index])
+time_interval = 0.14866719 #time interval between every reading (in seconds) - FIXED
+raw_data = d._data
+dirs = ["x-direction", "y-direction", "z-direction"]
+stds = []; means = []
+for index, i  in enumerate(raw_data):
+    std = np.std(i); mean = np.mean(i)
+    print(dirs[index], " standard dev is: ", std, " mean is:", mean)
+    stds.append(std)
+    means.append(mean)
+    
+    
 
-# plot_settings(maxval, filename)   
-# plt.savefig(f'{plot_path}/raw_data_{filename}.png', dpi = 200)
-# plt.show() 
 
 #%%
 # dx.encode_data()
@@ -133,15 +132,15 @@ plt.savefig(f'{plot_path}/compression_ratio_xyz_{maxblocksize}_{filename}.png', 
 # print(path_list)
 #%%
 stats_data = pd.read_csv("stats_prime.csv")
-compression_data = stats_data["Max Compression Ratio (Delta)"]
+compression_data = stats_data["Block Size (Delta)"] #Max Compression Ratio
 x_data = []; y_data = []; z_data = []; data = [x_data, y_data, z_data]
 for i in range(len(compression_data)):
     data[(i)%3].append(compression_data[i])
     
 print("whole data: ", compression_data)
 print("x data: ", x_data)
-plt.figure("Distribution of compression ratios over datasets")
-n, bins, patches = plt.hist(data, 15, stacked=True) #12 seems cool
+plt.figure("Distribution of block sizes of maximum compression over datasets")
+n, bins, patches = plt.hist(data, 20, stacked=True) #12 seems cool
 plt.gca().set_facecolor("#fffcf5")
-pretty_graph("Space Saving", "Number", "Distribution of Space Savings over datasets", 20)
+pretty_graph("Block Size", "Number", "Distribution of block sizes of maximum compression over datasets", 20)
 plt.legend(["x", "y", "z"])
