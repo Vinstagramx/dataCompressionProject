@@ -14,5 +14,4 @@ def plot_settings():
     plt.xlabel("Block size", fontsize = 22)
 
 plot_settings()
-plt.show()
 plt.savefig('spacesavingtemplate.png', dpi = 200)
