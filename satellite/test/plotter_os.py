@@ -36,6 +36,14 @@ def plot_settings(datalength, filename):
     plt.title(f"Space Saving Ratio vs Block (buffer) size - {filename}", fontsize = 24)
     plt.ylabel("Space Saving Ratio (%)", fontsize = 22)
     plt.xlabel("Block size", fontsize = 22)
+    
+    
+def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
+    plt.xlabel(x_label,fontsize=fontsize)
+    plt.title(title,fontsize=fontsize)
+    plt.ylabel(y_label,fontsize=fontsize) 
+    plt.tick_params(labelsize=fontsize)
+    plt.legend()
 
 #%%
 # dx = Delta(DATA_PATH, 20, 'all', direction="x")
@@ -123,3 +131,17 @@ plt.savefig(f'{plot_path}/spacesaving_ratio_xyz_{maxblocksize}_{filename}.png', 
 # df = pd.DataFrame(data = g)
 # df.to_csv(f'{csv_path}/stats.csv')
 # print(path_list)
+#%%
+stats_data = pd.read_csv("stats_prime.csv")
+compression_data = stats_data["Max Compression Ratio (Delta)"]
+x_data = []; y_data = []; z_data = []; data = [x_data, y_data, z_data]
+for i in range(len(compression_data)):
+    data[(i)%3].append(compression_data[i])
+    
+print("whole data: ", compression_data)
+print("x data: ", x_data)
+plt.figure("Distribution of compression ratios over datasets")
+n, bins, patches = plt.hist(data, 15, stacked=True) #12 seems cool
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Space Saving", "Number", "Distribution of Space Savings over datasets", 20)
+plt.legend(["x", "y", "z"])
