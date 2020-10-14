@@ -56,7 +56,7 @@ class Encoder(object):
     def get_mean(self):
         mean = np.mean(self._current_data)
         return mean
-        
+
     def get_block_bit_lengths(self, block):
         """
         Returns list of the bit length of binary/unary whatever is in the block.
@@ -105,9 +105,9 @@ class Encoder(object):
             i[0].hist(data[index], color=i[2])
             i[0].set_title(i[1]+"Bit Lengths in Block")
         
-    def get_compression_ratio(self):
+    def get_spacesaving_ratio(self):
         ratio = (1-self._encoded_bit_length/self._original_bit_length)*100
-        print(f'{self._direction}-compression ratio = {ratio}')
+        print(f'{self._direction}-space-saving ratio = {ratio}')
         return ratio
         
     def update_bit_diff(self, codeword, orig_block, encoded_block):
@@ -145,7 +145,7 @@ class Encoder(object):
                 codeword_length = self.get_block_bit_lengths([encoded_data[0]])[0]
                 self.update_bit_diff(codeword_length, block, encoded_block) #change this when golomb breaks!!
         # if ratio:
-            # self.get_compression_ratio()
+            # self.get_spacesaving_ratio()
         if stats:
             self.plot_block_stats()
         return self._new_data

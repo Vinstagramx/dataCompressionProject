@@ -33,8 +33,8 @@ def plot_settings(datalength, filename):
         plt.xlim(0, datalength)
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
-    plt.title(f"Compression ratio vs Block (buffer) size - {filename}", fontsize = 24)
-    plt.ylabel("Compression Ratio (%)", fontsize = 22)
+    plt.title(f"Space Saving Ratio vs Block (buffer) size - {filename}", fontsize = 24)
+    plt.ylabel("Space Saving Ratio (%)", fontsize = 22)
     plt.xlabel("Block size", fontsize = 22)
 
 #%%
@@ -73,16 +73,16 @@ for i in range(2, 200, 2):
     ytemp_encoder.encode_data(stats=False)
     ztemp_encoder = Delta(DATA_PATH, i, 'all', direction="z")
     ztemp_encoder.encode_data(stats=False)
-    xratios.append(xtemp_encoder.get_compression_ratio())
-    yratios.append(ytemp_encoder.get_compression_ratio())
-    zratios.append(ztemp_encoder.get_compression_ratio())
+    xratios.append(xtemp_encoder.get_spacesaving_ratio())
+    yratios.append(ytemp_encoder.get_spacesaving_ratio())
+    zratios.append(ztemp_encoder.get_spacesaving_ratio())
 #%%
 # plt.figure("Compression ratios")
 plt.plot(range(2, maxblocksize, step), xratios, label = 'x-direction')
 plt.plot(range(2, maxblocksize, step), yratios, label = 'y-direction')
 plt.plot(range(2, maxblocksize, step), zratios, label = 'z-direction')
 plot_settings(None, filename)
-plt.savefig(f'{plot_path}/compression_ratio_xyz_{maxblocksize}_{filename}.png', dpi = 200)
+plt.savefig(f'{plot_path}/spacesaving_ratio_xyz_{maxblocksize}_{filename}.png', dpi = 200)
 
 # """
 # Code to print raw data for multiple files
