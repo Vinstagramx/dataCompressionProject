@@ -51,17 +51,17 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 # dz = Delta(DATA_PATH, 20, 'all', direction="x")
 
 #%%
-time_interval = 0.14866719 #time interval between every reading (in seconds) - FIXED
-raw_data = d._data
-dirs = ["x-direction", "y-direction", "z-direction"]
-stds = []; means = []
-for index, i  in enumerate(raw_data):
-    std = np.std(i); mean = np.mean(i)
-    print(dirs[index], " standard dev is: ", std, " mean is:", mean)
-    stds.append(std)
-    means.append(mean)
-    
-    
+#time_interval = 0.14866719 #time interval between every reading (in seconds) - FIXED
+#raw_data = d._data
+#dirs = ["x-direction", "y-direction", "z-direction"]
+#stds = []; means = []
+#for index, i  in enumerate(raw_data):
+#    std = np.std(i); mean = np.mean(i)
+#    print(dirs[index], " standard dev is: ", std, " mean is:", mean)
+#    stds.append(std)
+#    means.append(mean)
+#    
+#    
 
 
 #%%
@@ -132,15 +132,45 @@ plt.savefig(f'{plot_path}/spacesaving_ratio_xyz_{maxblocksize}_{filename}.png', 
 # print(path_list)
 #%%
 stats_data = pd.read_csv("stats_prime.csv")
-compression_data = stats_data["Block Size (Delta)"] #Max Compression Ratio
+#%%
+compression_data = stats_data["Max Compression Ratio (Delta)"] #Max Compression Ratio
 x_data = []; y_data = []; z_data = []; data = [x_data, y_data, z_data]
 for i in range(len(compression_data)):
     data[(i)%3].append(compression_data[i])
-    
+
+#%%
 print("whole data: ", compression_data)
 print("x data: ", x_data)
-plt.figure("Distribution of block sizes of maximum compression over datasets")
+plt.figure("Distribution of maximum compression ratios over datasets")
 n, bins, patches = plt.hist(data, 20, stacked=True) #12 seems cool
 plt.gca().set_facecolor("#fffcf5")
-pretty_graph("Block Size", "Number", "Distribution of block sizes of maximum compression over datasets", 20)
-plt.legend(["x", "y", "z"])
+pretty_graph("Maximum Compression Ratio (%)", "", "Distribution of Maximum Compression Ratio over datasets", 20)
+plt.legend(["x", "y", "z"], fontsize = 18)
+#%%
+mean_data = stats_data["Means"]
+x_means = []; y_means = []; z_means = []; mean_datas = [x_means, y_means, z_means]
+for i in range(len(mean_data)):
+    mean_datas[(i)%3].append(mean_data[i])
+
+colours = ["C0", "C1", "C2"]
+for i in range(3):
+    plt.scatter(mean_datas[i], data[i], color = colours[i])
+
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Mean of raw data (nT)", "Maximum Compression Ratio", "Maximum compression ratio vs mean of raw data", 20)
+plt.legend(["x", "y", "z"], fontsize = 18)
+#%%
+std_data = stats_data["Standard Deviation (nT)"]
+x_std_data = []; y_std_data = []; z_std_data = []; std_datas = [x_std_data, y_std_data, z_std_data]
+for i in range(len(mean_data)):
+    std_datas[(i)%3].append(std_data[i])
+
+colours = ["C0", "C1", "C2"]
+for i in range(3):
+    plt.scatter(std_datas[i], data[i], color = colours[i])
+
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Standard Deviation of raw data (nT)", "Maximum Compression Ratio", "Maximum compression ratio vs standard deviation of raw data", 20)
+plt.legend(["x", "y", "z"], fontsize = 18)
+
+
