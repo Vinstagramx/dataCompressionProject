@@ -137,15 +137,13 @@ class Encoder(object):
             block = self._current_data[block_start:(block_start+self._block_size)]
             encoded_data = self.encode(block)
             encoded_block = encoded_data[1] #encode(block)[0] is the codeword, [1] the data encoded by codeword
-            #print(encoded_block)
             if stats:
                 lengths = self.get_block_bit_lengths(encoded_block)
                 self.block_stats(lengths)   
             if ratio:
-                codeword_length = self.get_block_bit_lengths([encoded_data[0]])[0]
+                codeword_length = sum(self.get_block_bit_lengths(encoded_data[0]))
                 self.update_bit_diff(codeword_length, block, encoded_block) #change this when golomb breaks!!
-        # if ratio:
-            # self.get_spacesaving_ratio()
+
         if stats:
             print("Doing stats")
             self.plot_block_stats()
@@ -162,7 +160,7 @@ class Delta(Encoder):
         for i in range(1,len(block)):
             compressed.append(block[i]-block[i-1])
         #compressed = [(i- ref_point) for i in block[1:]]
-        return [ref_point, compressed]
+        return [[ref_point], compressed]
 
 class DeltaSq(Encoder):
     """
@@ -193,7 +191,7 @@ class Golomb(Encoder):
         b = int(np.mean(block))
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
-        return [b, data]
+        return [[b], data]
     
     def update_bit_diff(self, codeword, orig_block, encoded_block):
         """
@@ -202,18 +200,23 @@ class Golomb(Encoder):
         half-block.
         """
         #self._original_bit_length += sum(self.get_block_bit_lengths(orig_block))
-        
         self._original_bit_length += 14*len(orig_block)
         block_length = len(encoded_block); halfway_point = int(block_length/2)
         max_bit_length_remainders = max(self.get_block_bit_lengths(encoded_block[:halfway_point]))
         max_bit_length_unaries = max(self.get_block_bit_lengths(encoded_block[halfway_point:]))
-        #print("original bit length: ", self._original_bit_length)
-        #print("original block length: ", len(orig_block), "encoded_block length: ", len(encoded_block ))
-
-        #self._encoded_bit_length += sum(self.get_block_bit_lengths(encoded_block)) + codeword
         self._encoded_bit_length += max_bit_length_remainders*halfway_point + max_bit_length_unaries * halfway_point + codeword
-        #print("encoded bit length: ", self._encoded_bit_length)
         return 0
-    
+
+class DeltaGolomb(Golomb):
+    def encode(self, block):
+        ref_point = block[0]; compressed = []
+        for i in range(1,len(block)):
+            compressed.append(block[i]-block[i-1])
+        b = int(np.mean(compressed))
+        golombs = [self.golomb(i, b) for i in compressed]
+        data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
+        return [[b, ref_point], data]
+        
+        
 
             
