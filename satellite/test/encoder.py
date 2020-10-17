@@ -25,7 +25,7 @@ class Encoder(object):
        
     def load_data(self, path):
         data = np.loadtxt(path).T
-        fixed_x = data[1] * 10000; fixed_y = data[2] * 10000; fixed_z = data[3] * 10000
+        fixed_x = data[1]/7.8125e-3; fixed_y = data[2]/7.8125e-3; fixed_z = data[3]/7.8125e-3
         fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32)
         return fixed_array
     
@@ -117,7 +117,7 @@ class Encoder(object):
         length of block by the maximum bit length in the block (because this 
         is how it will be on sub satellite.)
         """
-        #self._original_bit_length += sum(self.get_block_bit_lengths(orig_block))
+        
         self._original_bit_length += 14*len(orig_block)
         max_bit_length = max(self.get_block_bit_lengths(encoded_block))
         #self._encoded_bit_length += sum(self.get_block_bit_lengths(encoded_block)) + codeword
@@ -147,6 +147,7 @@ class Encoder(object):
         # if ratio:
             # self.get_spacesaving_ratio()
         if stats:
+            print("Doing stats")
             self.plot_block_stats()
         return self._new_data
     
@@ -183,8 +184,8 @@ class Golomb(Encoder):
     encode().
     """      
     def golomb(self, n, b):
-        q = n//b
-        r = n - q*b
+        q = n//b if n != 0 else 0
+        r = n - q*b if n!= 0 else 0
         quot = ["1" for i in range(0,q)] + ["0"]
         return ("".join(quot), r)
     
@@ -193,6 +194,26 @@ class Golomb(Encoder):
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
         return [b, data]
+    
+    def update_bit_diff(self, codeword, orig_block, encoded_block):
+        """
+        Fixed for Golomb - uses fact golomb encoded block is split [remainders, unaries] so can
+        just half at the middle and take max of both halves and multiply both by the length of the
+        half-block.
+        """
+        #self._original_bit_length += sum(self.get_block_bit_lengths(orig_block))
+        
+        self._original_bit_length += 14*len(orig_block)
+        block_length = len(encoded_block); halfway_point = int(block_length/2)
+        max_bit_length_remainders = max(self.get_block_bit_lengths(encoded_block[:halfway_point]))
+        max_bit_length_unaries = max(self.get_block_bit_lengths(encoded_block[halfway_point:]))
+        #print("original bit length: ", self._original_bit_length)
+        #print("original block length: ", len(orig_block), "encoded_block length: ", len(encoded_block ))
+
+        #self._encoded_bit_length += sum(self.get_block_bit_lengths(encoded_block)) + codeword
+        self._encoded_bit_length += max_bit_length_remainders*halfway_point + max_bit_length_unaries * halfway_point + codeword
+        #print("encoded bit length: ", self._encoded_bit_length)
+        return 0
     
 
             
