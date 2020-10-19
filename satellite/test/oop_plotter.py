@@ -52,5 +52,5 @@ plt.figure("Compression ratios")
 plt.plot(range(2, 70, 2), ratios, color="blue")
 pretty_graph("Block size", "Compression Ratio", "Delta Compression Ratio vs Block size in x direction", 20)
 
-#%% Plot stacked histogram of compression data for diff datasets
+#%% 
 
