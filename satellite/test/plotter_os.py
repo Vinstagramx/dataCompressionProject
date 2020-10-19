@@ -46,6 +46,8 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
     plt.legend()
 
 #%%
+raise Exception("oops")
+#%%
 # dx = Delta(DATA_PATH, 20, 'all', direction="x")
 # dx = Delta(DATA_PATH, 20, 'all', direction="x")
 # dz = Delta(DATA_PATH, 20, 'all', direction="x")
@@ -138,7 +140,7 @@ x_data = []; y_data = []; z_data = []; data = [x_data, y_data, z_data]
 for i in range(len(compression_data)):
     data[(i)%3].append(compression_data[i])
 
-#%%
+#%% HIST OF MAX COMPRESSION RATIOS
 print("whole data: ", compression_data)
 print("x data: ", x_data)
 plt.figure("Distribution of maximum compression ratios over datasets")
@@ -146,7 +148,7 @@ n, bins, patches = plt.hist(data, 20, stacked=True) #12 seems cool
 plt.gca().set_facecolor("#fffcf5")
 pretty_graph("Maximum Compression Ratio (%)", "", "Distribution of Maximum Compression Ratio over datasets", 20)
 plt.legend(["x", "y", "z"], fontsize = 18)
-#%%
+#%% MEAN VS MAX COMPRESSION
 mean_data = stats_data["Means"]
 x_means = []; y_means = []; z_means = []; mean_datas = [x_means, y_means, z_means]
 for i in range(len(mean_data)):
@@ -159,7 +161,7 @@ for i in range(3):
 plt.gca().set_facecolor("#fffcf5")
 pretty_graph("Mean of raw data (nT)", "Maximum Compression Ratio", "Maximum compression ratio vs mean of raw data", 20)
 plt.legend(["x", "y", "z"], fontsize = 18)
-#%%
+#%% STD VS MAX COMPRESSION
 std_data = stats_data["Standard Deviation (nT)"]
 x_std_data = []; y_std_data = []; z_std_data = []; std_datas = [x_std_data, y_std_data, z_std_data]
 for i in range(len(mean_data)):
@@ -172,5 +174,19 @@ for i in range(3):
 plt.gca().set_facecolor("#fffcf5")
 pretty_graph("Standard Deviation of raw data (nT)", "Maximum Compression Ratio", "Maximum compression ratio vs standard deviation of raw data", 20)
 plt.legend(["x", "y", "z"], fontsize = 18)
-
-
+#%% GOLOMB PLOTTING
+colours = ["C0", "C1", "C2"]; ratios = []
+plt.figure("Golomb b parameter efficiencies in z direction")
+for index, mode in enumerate(["min", "max", "mean"]):
+    ratios = []; buffer_sizes = range(2,70)
+    for i in buffer_sizes:
+        temp_encoder = Golomb(DATA_PATH, i, 1000, direction="z", mode=mode)
+        temp_encoder.encode_data(stats=False)
+        ratio = temp_encoder.get_spacesaving_ratio()
+        ratios.append(ratio)
+        print(i, ", ", ratio)
+    plt.plot(buffer_sizes, ratios, color=colours[index], label ="b: "+ mode)
+plt.legend(fontsize=20)
+pretty_graph("Block Size", "Compression Ratio", "Compression ratio as function of Block size for different b in z-dir - C3_160313", 20)
+#%%
+plt.gca().set_facecolor("#fffcf5")

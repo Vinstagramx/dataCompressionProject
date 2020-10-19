@@ -179,8 +179,27 @@ class DeltaSq(Encoder):
 class Golomb(Encoder):
     """
     Inherited class of Encoder with Golomb encoding implementation overriding
-    encode().
-    """      
+    encode(), init() and update_bit_diff_diff() to account for differences
+    between golomb and generic method.
+    """
+    def __init__(self, PATH, block_size=10, samples="all", direction ="x", mode = "mean"):
+        """
+        Overwritten to allow you to set mode for b - whether mean/min/max of 
+        block is used to divide.
+        """
+        self._block_size = block_size
+        self._new_data =[]
+        self._data = self.load_data(PATH)
+        self._direction = direction
+        directions = ["x", "y", "z"]
+        self._current_data = self._data[directions.index(direction)]  #filter to x,y,z only
+        self._block_regions = self.gen_samples(samples)
+        self._lengths_distribution = []
+        self._lengths_stats = []
+        self._original_bit_length = 0
+        self._encoded_bit_length = 0
+        self._mode = mode
+    
     def golomb(self, n, b):
         q = n//b if n != 0 else 0
         r = n - q*b if n!= 0 else 0
@@ -188,7 +207,12 @@ class Golomb(Encoder):
         return ("".join(quot), r)
     
     def encode(self, block):
-        b = int(np.mean(block))
+        if self._mode == "mean":
+            b = int(np.mean(block))
+        elif self._mode == "max":
+            b = max(block)
+        elif self._mode == "min":
+            b = min(block)
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
         return [[b], data]
