@@ -115,13 +115,17 @@ class Encoder(object):
         Adjusted slightly. Updates the class variables that track the running totals
         of bit lengths in unencoded and encoded blocks. Now just multiplies the 
         length of block by the maximum bit length in the block (because this 
-        is how it will be on sub satellite.)
+        is how it will be on sub satellite.) Added a check to see if encoded
+        block is bigger than original block and if so just uses the original
+        block, as reference
         """
-        
-        self._original_bit_length += 14*len(orig_block)
         max_bit_length = max(self.get_block_bit_lengths(encoded_block))
-        #self._encoded_bit_length += sum(self.get_block_bit_lengths(encoded_block)) + codeword
-        self._encoded_bit_length += max_bit_length*len(encoded_block) + codeword
+        orig_len = 14*len(orig_block); encoded_len = max_bit_length*len(encoded_block) + codeword
+        self._original_bit_length += orig_len
+        if orig_len < encoded_len: #equivalent to the non-encoded flag as per paper
+            self._encoded_bit_length += orig_len
+        else:
+            self._encoded_bit_length += encoded_len
         return 0
     
     def encode_data(self, ratio=True, stats=True):
@@ -223,12 +227,16 @@ class Golomb(Encoder):
         just half at the middle and take max of both halves and multiply both by the length of the
         half-block.
         """
-        #self._original_bit_length += sum(self.get_block_bit_lengths(orig_block))
-        self._original_bit_length += 14*len(orig_block)
+        orig_len = 14*len(orig_block)
         block_length = len(encoded_block); halfway_point = int(block_length/2)
+        self._original_bit_length += orig_len
         max_bit_length_remainders = max(self.get_block_bit_lengths(encoded_block[:halfway_point]))
         max_bit_length_unaries = max(self.get_block_bit_lengths(encoded_block[halfway_point:]))
-        self._encoded_bit_length += max_bit_length_remainders*halfway_point + max_bit_length_unaries * halfway_point + codeword
+        encoded_len = max_bit_length_remainders*halfway_point + max_bit_length_unaries * halfway_point + codeword
+        if orig_len < encoded_len:
+            self._encoded_bit_length += orig_len
+        else:
+            self._encoded_bit_length += encoded_len
         return 0
 
 class DeltaGolomb(Golomb):
