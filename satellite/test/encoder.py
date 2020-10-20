@@ -230,6 +230,8 @@ class Golomb(Encoder):
             b = max(block)
         elif self._mode == "min":
             b = min(block)
+        elif isinstance(self._mode, int):
+            b = (self._mode/100) * max(block)
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
         return [[b], data]
