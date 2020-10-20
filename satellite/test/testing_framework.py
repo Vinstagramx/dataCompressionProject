@@ -35,6 +35,13 @@ print(csv)
 
 
 #%%
+def check_for_max(ratios_list):
+    max_ratio = max(ratios_list)
+    for i in ratios_list[-10:] :
+        if i >= max_ratio and ratios_list[-1] < ratios_list[-2] and ratios_list[-2] < ratios_list[-3]:
+            return False
+    return True
+        
 def master_testing(encoder, indexes, arg_list):
     """
     Takes encoder (so pass Delta or Golomb into it), split: (start, end) and arg_list which should be list of format 
@@ -53,6 +60,11 @@ def master_testing(encoder, indexes, arg_list):
                 temp_encoder = encoder(*to_unpack)
                 temp_encoder.encode_data(stats=False)
                 ratios.append(temp_encoder.get_spacesaving_ratio())
+                if i > 10:
+                    check = check_for_max(ratios)
+                    if check:
+                        print("Local max found, exiting")
+                        break
             max_ratio = max(ratios); block_size = ratios.index(max_ratio) + 2
             print(max_ratio)
             max_ratios.append(max_ratio)
