@@ -27,13 +27,11 @@ figure.set_size_inches(18, 10)
 
 filename = datafile.split('.')[0]
 
-def plot_settings(datalength, filename):
+def plot_settings(filename):
     plt.legend()
-    if datalength != 0:
-        plt.xlim(0, datalength)
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
-    plt.title(f"Space Saving Ratio vs Block (buffer) size - {filename}", fontsize = 24)
+    plt.title(f"b Parameter Efficiencies in z direction - Golomb - {filename}", fontsize = 24)
     plt.ylabel("Space Saving Ratio (%)", fontsize = 22)
     plt.xlabel("Block size", fontsize = 22)
     
@@ -176,21 +174,25 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 #%% GOLOMB PLOTTING
 # colours = ["C0", "C1", "C2"]; 
 ratios = []
-plt.figure("Golomb b Parameter Efficiencies in y direction")
-b_list = np.arange(100, step = 20, dtype = np.int32).tolist()
+b_list = np.arange(120, step = 20, dtype = np.int32).tolist()
+b_list = b_list[1:]
+extra = [150, 200]
+for i in extra:
+    b_list.append(i)
 print(b_list)
 for index, mode in enumerate(b_list):
-    ratios = []; buffer_sizes = range(2,100)
+    ratios = []; buffer_sizes = range(2,100,5)
     for i in buffer_sizes:
-        temp_encoder = Golomb(DATA_PATH, i, 1000, direction="y", mode=mode)
+        temp_encoder = Golomb(DATA_PATH, i, 1000, direction="z", mode=mode)
         temp_encoder.encode_data(stats=False)
         ratio = temp_encoder.get_spacesaving_ratio()
         ratios.append(ratio)
         print(i, ", ", ratio)
     plt.plot(buffer_sizes, ratios, label =f"b:{mode}% max")
 plt.legend(fontsize=20)
-plot_settings()
-plt.savefig(f'{plot_path}/compratio_varied_y_{filename}.png', dpi = 200)
+
+plot_settings(filename)
+plt.savefig(f'{plot_path}/compratio_varied_z_{filename}.png', dpi = 200)
 
 # pretty_graph("Block Size", "Compression Ratio", "Compression ratio as function of Block size for different b in z-dir - C3_160313", 20)
 # plt.gca().set_facecolor("#fffcf5")
