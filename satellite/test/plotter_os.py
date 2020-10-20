@@ -46,7 +46,7 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
     plt.legend()
 
 #%%
-raise Exception("oops")
+# raise Exception("oops")
 #%%
 # dx = Delta(DATA_PATH, 20, 'all', direction="x")
 # dx = Delta(DATA_PATH, 20, 'all', direction="x")
