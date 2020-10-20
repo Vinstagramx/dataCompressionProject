@@ -38,9 +38,12 @@ print(csv)
 def check_for_max(ratios_list):
     max_ratio = max(ratios_list)
     for i in ratios_list[-10:] :
-        if i >= max_ratio and ratios_list[-1] < ratios_list[-2] and ratios_list[-2] < ratios_list[-3]:
+        if i >= max_ratio :
             return False
-    return True
+    if ratios_list[-1] < ratios_list[-2] and ratios_list[-2] < ratios_list[-3]:
+        return True
+    else:
+        return False
         
 def master_testing(encoder, indexes, arg_list):
     """
