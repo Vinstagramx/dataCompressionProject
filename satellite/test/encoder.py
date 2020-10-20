@@ -22,7 +22,7 @@ class Encoder(object):
         self._lengths_stats = []
         self._original_bit_length = 0
         self._encoded_bit_length = 0
-        self._range = (2**bits) * 7.8125e-3
+        self._range = (2**bits) / 7.8125e-3
         self._keep_original = True #flag to keep the original data if length of encoded block is longer
         self.filter_data()
        
