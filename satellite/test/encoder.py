@@ -213,7 +213,7 @@ class Golomb(Encoder):
         self._original_bit_length = 0
         self._encoded_bit_length = 0
         self._mode = mode
-        self._range = (2**bits) * 7.8125e-3
+        self._range = (2**bits) / 7.8125e-3
         self._keep_original = True
         self.filter_data()
     

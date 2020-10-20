@@ -44,13 +44,13 @@ for index, i  in enumerate(raw_data):
 ratios = []
 for i in range(2, 70, 2):
     print(i)
-    temp_encoder = Delta(DATA_PATH, i, 1000, direction="x")
+    temp_encoder = Golomb(DATA_PATH, i, 1000, direction="z", mode="max")
     temp_encoder.encode_data(stats=False)
     ratios.append(temp_encoder.get_spacesaving_ratio())
 #%%
 plt.figure("Compression ratios")
 plt.plot(range(2, 70, 2), ratios, color="blue")
-pretty_graph("Block size", "Compression Ratio", "Delta Compression Ratio vs Block size in x direction", 20)
+pretty_graph("Block size", "Compression Ratio", "Golomb Compression Ratio vs Block size in z direction", 20)
 
 #%% 
 
