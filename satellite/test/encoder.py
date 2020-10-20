@@ -23,6 +23,7 @@ class Encoder(object):
         self._original_bit_length = 0
         self._encoded_bit_length = 0
         self._range = (2**bits) * 7.8125e-3
+        self.filter_data()
        
     def load_data(self, path):
         data = np.loadtxt(path).T
@@ -177,7 +178,7 @@ class DeltaSq(Encoder):
     encode().
     """      
     def encode(self, block):
-        self.filter_data()
+        
         ref_point = block[0]; compressed, compressed2 = [], []
         for i in range(1,len(block)):
             compressed.append(block[i]-block[i-1])
@@ -192,7 +193,7 @@ class Golomb(Encoder):
     encode(), init() and update_bit_diff_diff() to account for differences
     between golomb and generic method.
     """
-    def __init__(self, PATH, block_size=10, samples="all", direction ="x", mode = "mean"):
+    def __init__(self, PATH, block_size=10, samples="all", direction ="x", mode = "mean", bits=14):
         """
         Overwritten to allow you to set mode for b - whether mean/min/max of 
         block is used to divide.
@@ -209,6 +210,8 @@ class Golomb(Encoder):
         self._original_bit_length = 0
         self._encoded_bit_length = 0
         self._mode = mode
+        self._range = (2**bits) * 7.8125e-3
+        self.filter_data()
     
     def golomb(self, n, b):
         q = n//b if n != 0 else 0
