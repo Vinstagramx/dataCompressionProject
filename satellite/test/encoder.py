@@ -10,7 +10,7 @@ import random
 import matplotlib.pyplot as plt
 
 class Encoder(object):
-    def __init__(self, PATH, block_size=10, samples="all", direction ="x"):
+    def __init__(self, PATH, block_size=10, samples="all", direction ="x", bits = 14):
         self._block_size = block_size
         self._new_data =[]
         self._data = self.load_data(PATH)
@@ -22,6 +22,7 @@ class Encoder(object):
         self._lengths_stats = []
         self._original_bit_length = 0
         self._encoded_bit_length = 0
+        self._range = (2**bits) * 7.8125e-3
        
     def load_data(self, path):
         data = np.loadtxt(path).T
@@ -42,6 +43,9 @@ class Encoder(object):
             chosen_indices = random.sample(block_regions, samples)
         return chosen_indices
 
+    def filter_data(self):
+        self._current_data = [value for value in self._current_data if abs(value) < self._range]
+        
     def binary(self, decimal):
         if decimal >= 0:
             sign_bit = 0
@@ -159,6 +163,7 @@ class Delta(Encoder):
     encode().
     """      
     def encode(self, block):
+        self.filter_data()
         ref_point = block[0]; compressed = []
         #compressed.append(ref_point)
         for i in range(1,len(block)):
@@ -172,6 +177,7 @@ class DeltaSq(Encoder):
     encode().
     """      
     def encode(self, block):
+        self.filter_data()
         ref_point = block[0]; compressed, compressed2 = [], []
         for i in range(1,len(block)):
             compressed.append(block[i]-block[i-1])
@@ -220,7 +226,7 @@ class Golomb(Encoder):
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
         return [[b], data]
-    
+
     def update_bit_diff(self, codeword, orig_block, encoded_block):
         """
         Fixed for Golomb - uses fact golomb encoded block is split [remainders, unaries] so can
