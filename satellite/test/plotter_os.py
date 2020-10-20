@@ -193,11 +193,11 @@ plt.gca().set_facecolor("#fffcf5")
 #%%PLOTTING SAMPLE SIZE VS ALL
 ratios = []
 sample_sizes = [10,30, 50, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3500, 4000, 4500, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000]
-full_encoder = Delta(DATA_PATH, 25, "all", direction="y")
+full_encoder = Delta(DATA_PATH, 25, "all", direction="z")
 full_encoder.encode_data(stats=False)
 for i in sample_sizes:
     print(i)
-    temp_encoder = Delta(DATA_PATH, 25, i, direction = "y")
+    temp_encoder = Delta(DATA_PATH, 25, i, direction = "z")
     temp_encoder.encode_data(stats=False)
     ratio = temp_encoder.get_spacesaving_ratio()
     ratios.append(ratio)
@@ -205,6 +205,6 @@ for i in sample_sizes:
 adj_rat = [i - full_encoder.get_spacesaving_ratio() for i in ratios ]
 plt.plot(sample_sizes, adj_rat)
 #plt.hlines(full_encoder.get_spacesaving_ratio(), 10, 15000, label = "All samples", color="red")
-pretty_graph("Sample Size", "Difference in Compression Ratio from all", "Difference from compression ratio from using all samples in y-dir - C3_160313", 20)
+pretty_graph("Sample Size", "Difference in Compression Ratio from all", "Difference from compression ratio from using all samples in z-dir - C3_160313", 20)
 plt.gca().set_facecolor("#fffcf5")
 plt.legend(fontsize=18)
