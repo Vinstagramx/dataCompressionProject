@@ -231,7 +231,7 @@ class Golomb(Encoder):
         elif self._mode == "min":
             b = min(block)
         elif isinstance(self._mode, int): #can set b parameter to percentage of max
-            b = round((self._mode/100) * max(block))
+            b = int(round((self._mode/100) * max(block)))
 
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
