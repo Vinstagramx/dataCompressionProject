@@ -35,13 +35,13 @@ print(csv)
 
 
 #%%
-def master_testing(encoder, split, arg_list):
+def master_testing(encoder, indexes, arg_list):
     """
     Takes encoder (so pass Delta or Golomb into it), split: (start, end) and arg_list which should be list of format 
     [sample_size, bits, mode, any other valid optional arguments]
     """
     loop = 0; max_ratios = []; max_blocks = []
-    for filename in files[split[0]:split[1]]:
+    for filename in files[indexes[0]:indexes[1]]:
         file_index = filename[:9]
         dirs = ["x", "y", "z"]
         file_path = os.path.join(data_path, filename)
@@ -61,9 +61,9 @@ def master_testing(encoder, split, arg_list):
     return (max_ratios, max_blocks)
 
 #%%
-max_ratios = [], max_blocks = []
+max_ratios = []; max_blocks = []
 for b in ["min", "max", "mean"]:
-    temp = master_testing(Golomb, (0,6), [8000, 14, b])
+    temp = master_testing(Golomb, [0,6], [7000, 14, b])
     max_ratios.append(temp[0])
     max_blocks.append(temp[1])
 
