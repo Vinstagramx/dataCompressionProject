@@ -23,6 +23,7 @@ class Encoder(object):
         self._original_bit_length = 0
         self._encoded_bit_length = 0
         self._range = (2**bits) * 7.8125e-3
+        self._keep_original = True #flag to keep the original data if length of encoded block is longer
         self.filter_data()
        
     def load_data(self, path):
@@ -127,9 +128,12 @@ class Encoder(object):
         max_bit_length = max(self.get_block_bit_lengths(encoded_block))
         orig_len = 14*len(orig_block); encoded_len = max_bit_length*len(encoded_block) + codeword
         self._original_bit_length += orig_len
-        if orig_len < encoded_len: #equivalent to the non-encoded flag as per paper
-            self._encoded_bit_length += orig_len
-        else:
+        if self._keep_original == True:
+            if orig_len < encoded_len: #equivalent to the non-encoded flag as per paper
+                self._encoded_bit_length += orig_len
+            else:
+                self._encoded_bit_length += encoded_len
+        else: 
             self._encoded_bit_length += encoded_len
         return 0
     
