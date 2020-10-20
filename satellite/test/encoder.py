@@ -17,7 +17,6 @@ class Encoder(object):
         self._direction = direction
         directions = ["x", "y", "z"]
         self._current_data = self._data[directions.index(direction)]  #filter to x,y,z only
-        self._block_regions = self.gen_samples(samples)
         self._lengths_distribution = []
         self._lengths_stats = []
         self._original_bit_length = 0
@@ -25,6 +24,7 @@ class Encoder(object):
         self._range = (2**bits) / 7.8125e-3
         self._keep_original = True #flag to keep the original data if length of encoded block is longer
         self.filter_data()
+        self._block_regions = self.gen_samples(samples)
        
     def load_data(self, path):
         data = np.loadtxt(path).T

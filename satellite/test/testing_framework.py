@@ -78,12 +78,12 @@ def master_testing(encoder, indexes, arg_list):
 #%%
 max_ratios = []; max_blocks = []
 for b in ["min", "max", "mean"]:
-    temp = master_testing(Golomb, [0,6], [7000, 14, b])
+    temp = master_testing(Golomb, [6,9], [7000, 14, b])
     max_ratios.append(temp[0])
     max_blocks.append(temp[1])
 
-np.save("max_golomb_ratios_to_18_b", max_ratios)
-np.save("max_golomb_blocks_to_18_b", max_blocks)
+np.save("max_golomb_ratios_6_9", max_ratios)
+np.save("max_golomb_blocks_6_9", max_blocks)
 #csv["Delta"] = max_ratios
 #csv["Block"] = max_blocks
 #csv.to_csv("stats_prime.csv")
