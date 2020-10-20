@@ -29,7 +29,7 @@ class Encoder(object):
     def load_data(self, path):
         data = np.loadtxt(path).T
         fixed_x = data[1]/7.8125e-3; fixed_y = data[2]/7.8125e-3; fixed_z = data[3]/7.8125e-3
-        fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32)
+        fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32) #does this round down or nearest - if we can't reconstruct data look at this 
         return fixed_array
     
     def gen_samples(self, samples, seed=2):
@@ -196,7 +196,7 @@ class Golomb(Encoder):
     encode(), init() and update_bit_diff_diff() to account for differences
     between golomb and generic method.
     """
-    def __init__(self, PATH, block_size=10, samples="all", direction ="x", mode = "mean", bits=14):
+    def __init__(self, PATH, block_size=10, samples="all", direction ="x", bits=14, mode = "mean"):
         """
         Overwritten to allow you to set mode for b - whether mean/min/max of 
         block is used to divide.
