@@ -246,8 +246,11 @@ class Golomb(Encoder):
         max_bit_length_remainders = max(self.get_block_bit_lengths(encoded_block[:halfway_point]))
         max_bit_length_unaries = max(self.get_block_bit_lengths(encoded_block[halfway_point:]))
         encoded_len = max_bit_length_remainders*halfway_point + max_bit_length_unaries * halfway_point + codeword
-        if orig_len < encoded_len:
-            self._encoded_bit_length += orig_len
+        if self._keep_original == True:
+            if orig_len < encoded_len:
+                self._encoded_bit_length += orig_len
+            else:
+                self._encoded_bit_length += encoded_len
         else:
             self._encoded_bit_length += encoded_len
         return 0
