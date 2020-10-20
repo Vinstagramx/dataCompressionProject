@@ -168,7 +168,6 @@ class Delta(Encoder):
     encode().
     """      
     def encode(self, block):
-        self.filter_data()
         ref_point = block[0]; compressed = []
         #compressed.append(ref_point)
         for i in range(1,len(block)):
