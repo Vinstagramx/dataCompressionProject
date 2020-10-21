@@ -99,5 +99,21 @@ block_data = up_to_18_blocks + from_19_blocks
 csv["Delta"] = ratio_data
 csv["Block"] = block_data
 #%%
+up_to_18_blocks = list(np.load("max_golomb_blocks_to_18_b.npy"))
+from_18_to_27_blocks = list(np.load("max_golomb_blocks_6_9.npy"))
+from_27_to_36_blocks = list(np.load("max_golomb_blocks_3.npy"))
+up_to_18_ratios = list(np.load("max_golomb_ratios_to_18_b.npy"))
+from_18_to_27_ratios = list(np.load("max_golomb_ratios_6_9.npy"))
+from_27_to_36_ratios = list(np.load("max_golomb_ratios_3.npy"))
+modes = ["min", "max", "mean"]
+
+for i in range(0,3):
+    print(up_to_18_blocks[i], from_18_to_27_blocks[i], from_27_to_36_blocks[i])
+    temp_blocks = list(up_to_18_blocks[i]) + list(from_18_to_27_blocks[i])+list(from_27_to_36_blocks[i])
+    temp_ratios = list(up_to_18_ratios[i]) + list(from_18_to_27_ratios[i])+list(from_27_to_36_ratios[i])
+    print(temp_ratios)
+    csv["Golomb- "+modes[i]] = temp_ratios
+    csv["Block size- " +modes[i]]= temp_blocks
+#%%
 csv.to_csv("stats_prime.csv")
 

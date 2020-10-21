@@ -174,6 +174,47 @@ for i in range(3):
 plt.gca().set_facecolor("#fffcf5")
 pretty_graph("Standard Deviation of raw data (nT)", "Maximum Compression Ratio", "Maximum compression ratio vs standard deviation of raw data", 20)
 plt.legend(["x", "y", "z"], fontsize = 18)
+#%% GOLOMB HISTOS
+all_modes = []
+for i in ["min", "max", "mean"]:
+    compression_data = stats_data["Golomb- "+ i] #Max Compression Ratio
+    all_modes.append(compression_data)
+    x_data = []; y_data = []; z_data = []; data = [x_data, y_data, z_data]
+    for j in range(len(compression_data)):
+        data[(j)%3].append(compression_data[j])
+    plt.figure("Distribution of maximum compression ratios over datasets- Golomb "+i)
+    n, bins, patches = plt.hist(data, 20, stacked=True) #12 seems cool
+    plt.gca().set_facecolor("#fffcf5")
+    pretty_graph("Maximum Compression Ratio (%)", "", "Distribution of Maximum Compression Ratio over datasets- Golomb "+i, 20)
+    plt.legend(["x", "y", "z"], fontsize = 18)
+
+plt.figure("Distribution of maxium compression ratios over datasets and modes")
+n, bins, patches = plt.hist(all_modes, 20, stacked=True, color = ["slateblue", "gold", "springgreen"]) #12 seems cool
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Maximum Compression Ratio (%)", "", "Distribution of Maximum Compression Ratio over datasets and modes- Golomb", 20)
+plt.legend(["min", "max", "mean"], fontsize = 18)
+
+#%%
+all_modes = []
+for i in ["min", "max", "mean"]:
+    compression_data = stats_data["Block size- "+ i] #Max Compression Ratio
+    all_modes.append(compression_data)
+    x_data = []; y_data = []; z_data = []; data = [x_data, y_data, z_data]
+    for j in range(len(compression_data)):
+        data[(j)%3].append(compression_data[j])
+    plt.figure("Distribution of block sizes of maximum compression ratios over datasets- Golomb "+i)
+    n, bins, patches = plt.hist(data, 20, stacked=True) #12 seems cool
+    plt.gca().set_facecolor("#fffcf5")
+    pretty_graph("Block Size", "", "Distribution of Block Sizes of Maximum Compression Ratio over datasets- Golomb "+i, 20)
+    plt.legend(["x", "y", "z"], fontsize = 18)
+
+plt.figure("Distribution of block sizes of maxium compression ratios over datasets and modes")
+n, bins, patches = plt.hist(all_modes, 20, stacked=True, color = ["slateblue", "gold", "springgreen"]) #12 seems cool
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Block Size", "", "Distribution of Block Sizes Maximum Compression Ratio over datasets and modes- Golomb", 20)
+plt.legend(["min", "max", "mean"], fontsize = 18)
+
+
 #%% GOLOMB PLOTTING
 colours = ["C0", "C1", "C2"]; ratios = []
 plt.figure("Golomb b parameter efficiencies in z direction")
@@ -205,6 +246,6 @@ for i in sample_sizes:
 adj_rat = [i - full_encoder.get_spacesaving_ratio() for i in ratios ]
 plt.plot(sample_sizes, adj_rat)
 #plt.hlines(full_encoder.get_spacesaving_ratio(), 10, 15000, label = "All samples", color="red")
-pretty_graph("Sample Size", "Difference in Compression Ratio from all", "Difference from compression ratio from using all samples in z-dir - C3_160313", 20)
+pretty_graph("Sample Size", "Difference in Compression Ratio from all (%)", "Difference from compression ratio from using all samples in z-dir - C3_160313", 20)
 plt.gca().set_facecolor("#fffcf5")
 plt.legend(fontsize=18)
