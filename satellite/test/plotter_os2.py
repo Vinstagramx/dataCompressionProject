@@ -17,22 +17,22 @@ cwd = os.getcwd()
 Working with a singular file
 '''
 
-parent_dir = os.path.dirname(cwd)
-datafile = 'C3_160313.FS.FULLRES.txt'
-DATA_PATH = os.path.join(cwd, 'data', datafile)
+# parent_dir = os.path.dirname(cwd)
+# datafile = 'C3_160313.FS.FULLRES.txt'
+# DATA_PATH = os.path.join(cwd, 'data', datafile)
 plot_path = os.path.join(cwd, 'test', 'plots')
 plt.clf()
 figure = plt.gcf()  # get current figure
 figure.set_size_inches(18, 10)
 
-filename = datafile.split('.')[0]
+# filename = datafile.split('.')[0]
 
 def plot_settings(filename):
     plt.legend()
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
-    plt.title(f"b Parameter Efficiencies in z direction - Golomb - {filename}", fontsize = 24)
-    plt.ylabel("Space Saving Ratio (%)", fontsize = 22)
+    plt.title(f"Compression Ratio vs Block size (Golomb) - {filename}", fontsize = 24)
+    plt.ylabel("Compression Ratio (%)", fontsize = 22)
     plt.xlabel("Block size", fontsize = 22)
     
 def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
@@ -68,27 +68,38 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 # dy.encode_data()
 # dz.encode_data()
 #%%
-# xratios, yratios, zratios = [], [], []
-# maxblocksize = 200
-# step = 2
-# for i in range(2, 200, 2):
-#     print(i)
-#     xtemp_encoder = Delta(DATA_PATH, i, 'all', direction="x")
-#     xtemp_encoder.encode_data(stats=False)
-#     ytemp_encoder = Delta(DATA_PATH, i, 'all', direction="y")
-#     ytemp_encoder.encode_data(stats=False)
-#     ztemp_encoder = Delta(DATA_PATH, i, 'all', direction="z")
-#     ztemp_encoder.encode_data(stats=False)
-#     xratios.append(xtemp_encoder.get_spacesaving_ratio())
-#     yratios.append(ytemp_encoder.get_spacesaving_ratio())
-#     zratios.append(ztemp_encoder.get_spacesaving_ratio())
-# #%%
-# # plt.figure("Compression ratios")
-# plt.plot(range(2, maxblocksize, step), xratios, label = 'x-direction')
-# plt.plot(range(2, maxblocksize, step), yratios, label = 'y-direction')
-# plt.plot(range(2, maxblocksize, step), zratios, label = 'z-direction')
-# plot_settings(None, filename)
-# plt.savefig(f'{plot_path}/spacesaving_ratio_xyz_{maxblocksize}_{filename}.png', dpi = 200)
+data_folder = os.path.join(cwd, 'data')
+path_list = []
+filenames = []
+fullfilenames = ['C1_160308.FS.FULLRES.txt', 'C3_160313.FS.FULLRES.txt']
+for file in fullfilenames:
+    if file.endswith(".txt"):
+        filenames.append(file.split('.')[0])
+        path_list.append(os.path.join(data_folder, file))
+
+for ind, path in enumerate(path_list):
+    plt.clf()
+    xratios, yratios, zratios = [], [], []
+    maxblocksize = 200
+    step = 2
+    for i in range(2, 200, 2):
+        print(i)
+        xtemp_encoder = Golomb(path, i, 'all', direction="x")
+        xtemp_encoder.encode_data(stats=False)
+        ytemp_encoder = Golomb(path, i, 'all', direction="y")
+        ytemp_encoder.encode_data(stats=False)
+        ztemp_encoder = Golomb(path, i, 'all', direction="z")
+        ztemp_encoder.encode_data(stats=False)
+        xratios.append(xtemp_encoder.get_spacesaving_ratio())
+        yratios.append(ytemp_encoder.get_spacesaving_ratio())
+        zratios.append(ztemp_encoder.get_spacesaving_ratio())
+    #%%
+    # plt.figure("Compression ratios")
+    plt.plot(range(2, maxblocksize, step), xratios, label = 'x-direction')
+    plt.plot(range(2, maxblocksize, step), yratios, label = 'y-direction')
+    plt.plot(range(2, maxblocksize, step), zratios, label = 'z-direction')
+    plot_settings(filenames[ind])
+    plt.savefig(f'{plot_path}/golomb_compression_ratio_xyz_{maxblocksize}_{filenames[ind]}.png', dpi = 200)
 
 # """
 # Code to print raw data for multiple files
@@ -173,26 +184,26 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 # plt.legend(["x", "y", "z"], fontsize = 18)
 #%% GOLOMB PLOTTING
 # colours = ["C0", "C1", "C2"]; 
-ratios = []
-b_list = np.arange(120, step = 20, dtype = np.int32).tolist()
-b_list = b_list[1:]
-extra = [150, 200]
-for i in extra:
-    b_list.append(i)
-print(b_list)
-for index, mode in enumerate(b_list):
-    ratios = []; buffer_sizes = range(2,100,5)
-    for i in buffer_sizes:
-        temp_encoder = Golomb(DATA_PATH, i, 1000, direction="z", mode=mode)
-        temp_encoder.encode_data(stats=False)
-        ratio = temp_encoder.get_spacesaving_ratio()
-        ratios.append(ratio)
-        print(i, ", ", ratio)
-    plt.plot(buffer_sizes, ratios, label =f"b:{mode}% max")
-plt.legend(fontsize=20)
+# ratios = []
+# b_list = np.arange(120, step = 20, dtype = np.int32).tolist()
+# b_list = b_list[1:]
+# extra = [150, 200]
+# for i in extra:
+#     b_list.append(i)
+# print(b_list)
+# for index, mode in enumerate(b_list):
+#     ratios = []; buffer_sizes = range(2,100,5)
+#     for i in buffer_sizes:
+#         temp_encoder = Golomb(DATA_PATH, i, 1000, direction="z", mode=mode)
+#         temp_encoder.encode_data(stats=False)
+#         ratio = temp_encoder.get_spacesaving_ratio()
+#         ratios.append(ratio)
+#         print(i, ", ", ratio)
+#     plt.plot(buffer_sizes, ratios, label =f"b:{mode}% max")
+# plt.legend(fontsize=20)
 
-plot_settings(filename)
-plt.savefig(f'{plot_path}/compratio_varied_z_{filename}.png', dpi = 200)
+# plot_settings(filename)
+# plt.savefig(f'{plot_path}/compratio_varied_z_{filename}.png', dpi = 200)
 
 # pretty_graph("Block Size", "Compression Ratio", "Compression ratio as function of Block size for different b in z-dir - C3_160313", 20)
 # plt.gca().set_facecolor("#fffcf5")
