@@ -196,7 +196,7 @@ class Golomb(Encoder):
     encode(), init() and update_bit_diff_diff() to account for differences
     between golomb and generic method.
     """
-    def __init__(self, PATH, block_size=10, samples="all", direction ="x", bits=14, mode = "mean"):
+    def __init__(self, PATH, block_size=10, samples="all", direction ="x", bits=14, mode = "max"):
         """
         Overwritten to allow you to set mode for b - whether mean/min/max of 
         block is used to divide.
