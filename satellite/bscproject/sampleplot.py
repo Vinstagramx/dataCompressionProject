@@ -21,12 +21,18 @@ Created on Thu Oct  1 12:19:47 2020
 # plt.plot(df['cortime'], df['y'])
 # plt.plot(df['cortime'], df['z'])
 
-def power_two(param):
-    power = 1
-    while(power < param):
-        power*=2
-    print(f'closest exponent = {power}')
-    return power
+# def power_two(param):
+#     power = 1
+#     while(power < param):
+#         power*=2
+#     print(f'closest exponent = {power}')
+#     return power
+from math import log, floor, ceil
 
-x = 200
-power_two(x)
+def power_two(param):
+    possible_results = floor(log(param, 2)), ceil(log(param, 2))
+    return 2**int(min(possible_results, key= lambda z: abs(param-2**z)))
+
+x = 127
+y = 193
+print(power_two(x), power_two(y))

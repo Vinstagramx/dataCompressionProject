@@ -5,6 +5,7 @@ Created on Mon Oct  5 17:55:18 2020
 @author: Ronan
 """
 import numpy as np
+from math import log, ceil, floor
 from scipy import stats
 import random 
 import matplotlib.pyplot as plt
@@ -224,11 +225,10 @@ class GolombRice(Encoder):
         return ("".join(quot), r)
     
     def power_two(self, param):
-        power = 1
-        while(power < param):
-            power*=2
-        # print(f'closest exponent = {power}')
-        return power
+        if param <= 1:
+            return 2
+        possible_results = floor(log(param, 2)), ceil(log(param, 2))
+        return 2**int(min(possible_results, key= lambda z: abs(param-2**z)))
 
     def encode(self, block):
         maxval = max(block)
