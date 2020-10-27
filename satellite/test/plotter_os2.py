@@ -78,6 +78,10 @@ for file in fullfilenames:
         path_list.append(os.path.join(data_folder, file))
 
 for ind, path in enumerate(path_list):
+    plt.clf()
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(18, 10)
+
     plt.figure(path)
     xratios, yratios, zratios = [], [], []
     maxblocksize = 30
