@@ -281,7 +281,6 @@ class GolombRice(Golomb):
         return [[b], data]
 
 
-
 class DeltaGolomb(Golomb):
     def encode(self, block):
         ref_point = block[0]; compressed = []
@@ -292,6 +291,15 @@ class DeltaGolomb(Golomb):
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
         return [[ref_point, b], data]
         
-        
+class DeltaGR(GolombRice):
+    def encode(self, block):
+        ref_point = block[0]; compressed = []
+        for i in range(1,len(block)):
+            compressed.append(block[i]-block[i-1])
+        maxval = max(block)
+        b = self.power_two(maxval)
+        golombs = [self.golomb(i, b) for i in compressed]
+        data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
+        return [[ref_point, b], data]
 
             

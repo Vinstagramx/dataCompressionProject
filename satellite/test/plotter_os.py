@@ -7,7 +7,7 @@ Altered to use os package and to work with current working directories.
 
 import os
 import matplotlib.pyplot as plt
-from encoder import Delta, Golomb
+from encoder import Delta, Golomb, DeltaGR
 import numpy as np
 import pandas as pd
 
@@ -72,15 +72,15 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 # dz.encode_data()
 #%%
 xratios, yratios, zratios = [], [], []
-maxblocksize = 200
+maxblocksize = 50
 step = 2
-for i in range(2, 200, 2):
+for i in range(2, 50, 2):
     print(i)
-    xtemp_encoder = Delta(DATA_PATH, i, 'all', direction="x")
+    xtemp_encoder = DeltaGR(DATA_PATH, i, 'all', direction="x")
     xtemp_encoder.encode_data(stats=False)
-    ytemp_encoder = Delta(DATA_PATH, i, 'all', direction="y")
+    ytemp_encoder = DeltaGR(DATA_PATH, i, 'all', direction="y")
     ytemp_encoder.encode_data(stats=False)
-    ztemp_encoder = Delta(DATA_PATH, i, 'all', direction="z")
+    ztemp_encoder = DeltaGR(DATA_PATH, i, 'all', direction="z")
     ztemp_encoder.encode_data(stats=False)
     xratios.append(xtemp_encoder.get_spacesaving_ratio())
     yratios.append(ytemp_encoder.get_spacesaving_ratio())
