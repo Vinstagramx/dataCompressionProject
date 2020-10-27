@@ -228,11 +228,11 @@ class Golomb(Encoder):
         if self._mode == "mean":
             b = int(np.mean(block))
         elif self._mode == "max":
-            b = max(abs(i) for i in block)
+            b = max([abs(i) for i in block])
         elif self._mode == "min":
-            b = min(abs(i) for i in block)
+            b = min([abs(i) for i in block])
         elif isinstance(self._mode, int): #can set b parameter to percentage of max
-            b = int(round((self._mode/100) * max(abs(i) for i in block)))
+            b = int(round((self._mode/100) * max([abs(i) for i in block])))
 
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)

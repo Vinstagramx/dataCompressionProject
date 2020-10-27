@@ -44,13 +44,25 @@ def check_for_max(ratios_list):
         return True
     else:
         return False
+    
+def get_tolerance(ratios_list):
+    """
+    Get the range for which the compression ratios are within 95% of maximum value.
+    Return the first and last index of this array.
+    """
+    max_ratio = max(ratios_list)
+    tolerance_range = []
+    for index, i in enumerate(ratios_list):
+        if i/max_ratio >= 0.95:
+            tolerance_range.append(index)
+    return (tolerance_range[0]+2, tolerance_range[-1]+2)
         
 def master_testing(encoder, indexes, arg_list):
     """
     Takes encoder (so pass Delta or Golomb into it), split: (start, end) and arg_list which should be list of format 
     [sample_size, bits, mode, any other valid optional arguments]
     """
-    loop = 0; max_ratios = []; max_blocks = []
+    loop = 0; max_ratios = []; max_blocks = []; tolerance_ranges = []
     for filename in files[indexes[0]:indexes[1]]:
         file_index = filename[:9]
         dirs = ["x", "y", "z"]
@@ -72,18 +84,22 @@ def master_testing(encoder, indexes, arg_list):
             print(max_ratio)
             max_ratios.append(max_ratio)
             max_blocks.append(block_size)
+            tolerance_ranges.append(get_tolerance(ratios))
             loop+=1
-    return (max_ratios, max_blocks)
+            
+    return (max_ratios, max_blocks, tolerance_ranges)
 
 #%%
-max_ratios = []; max_blocks = []
-for b in ["min", "max", "mean"]:
-    temp = master_testing(Golomb, [6,9], [7000, 14, b])
-    max_ratios.append(temp[0])
-    max_blocks.append(temp[1])
+max_ratios = []; max_blocks = []; tolerances = []
 
-np.save("max_golomb_ratios_6_9", max_ratios)
-np.save("max_golomb_blocks_6_9", max_blocks)
+temp = master_testing(Delta, [0,12], [7000, 14])
+max_ratios.append(temp[0])
+max_blocks.append(temp[1])
+tolerances.append(temp[2])
+
+np.save("max_delta_ratios_all", max_ratios)
+np.save("max_delta_blocks_all", max_blocks)
+np.save("tolerances_delta_all", tolerances)
 #csv["Delta"] = max_ratios
 #csv["Block"] = max_blocks
 #csv.to_csv("stats_prime.csv")

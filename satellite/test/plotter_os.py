@@ -72,15 +72,15 @@ def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
 # dz.encode_data()
 #%%
 xratios, yratios, zratios = [], [], []
-maxblocksize = 50
+maxblocksize = 30
 step = 2
-for i in range(2, 50, 2):
+for i in range(2, 30, 2):
     print(i)
-    xtemp_encoder = DeltaGR(DATA_PATH, i, 'all', direction="x")
+    xtemp_encoder = Golomb(DATA_PATH, i, 5000, direction="x", mode="max")
     xtemp_encoder.encode_data(stats=False)
-    ytemp_encoder = DeltaGR(DATA_PATH, i, 'all', direction="y")
+    ytemp_encoder = Golomb(DATA_PATH, i, 5000, direction="y", mode="max")
     ytemp_encoder.encode_data(stats=False)
-    ztemp_encoder = DeltaGR(DATA_PATH, i, 'all', direction="z")
+    ztemp_encoder = Golomb(DATA_PATH, i, 5000, direction="z", mode="max")
     ztemp_encoder.encode_data(stats=False)
     xratios.append(xtemp_encoder.get_spacesaving_ratio())
     yratios.append(ytemp_encoder.get_spacesaving_ratio())
