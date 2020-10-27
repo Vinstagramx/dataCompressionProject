@@ -78,22 +78,21 @@ for file in fullfilenames:
         path_list.append(os.path.join(data_folder, file))
 
 for ind, path in enumerate(path_list):
-    plt.clf()
+    plt.figure(path)
     xratios, yratios, zratios = [], [], []
-    maxblocksize = 200
+    maxblocksize = 30
     step = 2
-    for i in range(2, 200, 2):
+    for i in range(2, 30, 2):
         print(i)
-        xtemp_encoder = GolombRice(path, i, 'all', direction="x")
+        xtemp_encoder = GolombRice(path, i, 5000, direction="x")
         xtemp_encoder.encode_data(stats=False)
-        ytemp_encoder = GolombRice(path, i, 'all', direction="y")
+        ytemp_encoder = GolombRice(path, i, 5000, direction="y")
         ytemp_encoder.encode_data(stats=False)
-        ztemp_encoder = GolombRice(path, i, 'all', direction="z")
+        ztemp_encoder = GolombRice(path, i, 5000, direction="z")
         ztemp_encoder.encode_data(stats=False)
         xratios.append(xtemp_encoder.get_spacesaving_ratio())
         yratios.append(ytemp_encoder.get_spacesaving_ratio())
         zratios.append(ztemp_encoder.get_spacesaving_ratio())
-    #%%
     # plt.figure("Compression ratios")
     plt.plot(range(2, maxblocksize, step), xratios, label = 'x-direction')
     plt.plot(range(2, maxblocksize, step), yratios, label = 'y-direction')

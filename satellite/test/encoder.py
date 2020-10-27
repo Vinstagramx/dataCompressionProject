@@ -191,73 +191,6 @@ class DeltaSq(Encoder):
             compressed2.append(compressed[i]-compressed[i-1])
         return [[ref_point, delta_ref], compressed2]
 
-class GolombRice(Encoder):
-    """
-    Inherited class of Encoder with Golomb-Rice encoding implementation overriding
-    encode(), init() and update_bit_diff_diff() to account for differences
-    between golomb and generic method. Main difference between Golomb-Rice encoding and Golomb
-    is that the parameter b is the nearest exponent of 2 to the maximum value of the block.
-    """
-    def __init__(self, PATH, block_size=10, samples="all", direction ="x", bits=14):
-        """
-        Overwritten to allow you to set mode for b - whether mean/min/max of 
-        block is used to divide.
-        """
-        self._block_size = block_size
-        self._new_data =[]
-        self._data = self.load_data(PATH)
-        self._direction = direction
-        directions = ["x", "y", "z"]
-        self._current_data = self._data[directions.index(direction)]  #filter to x,y,z only
-        self._lengths_distribution = []
-        self._lengths_stats = []
-        self._original_bit_length = 0
-        self._encoded_bit_length = 0
-        self._range = (2**bits) / 7.8125e-3
-        self._keep_original = True
-        self.filter_data()
-        self._block_regions = self.gen_samples(samples)
-    
-    def golomb(self, n, b):
-        q = n//b if n != 0 else 0
-        r = n - q*b if n!= 0 else 0
-        quot = ["1" for i in range(0,q)] + ["0"]
-        return ("".join(quot), r)
-    
-    def power_two(self, param):
-        if param <= 1:
-            return 2
-        possible_results = floor(log(param, 2)), ceil(log(param, 2))
-        return 2**int(min(possible_results, key= lambda z: abs(param-2**z)))
-
-    def encode(self, block):
-        maxval = max(block)
-        b = self.power_two(maxval)
-        golombs = [self.golomb(i, b) for i in block]
-        data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
-        return [[b], data]
-
-    def update_bit_diff(self, codeword, orig_block, encoded_block):
-        """
-        Fixed for Golomb - uses fact golomb encoded block is split [remainders, unaries] so can
-        just half at the middle and take max of both halves and multiply both by the length of the
-        half-block.
-        """
-        orig_len = 14*len(orig_block)
-        block_length = len(encoded_block); halfway_point = int(block_length/2)
-        self._original_bit_length += orig_len
-        max_bit_length_remainders = max(self.get_block_bit_lengths(encoded_block[:halfway_point]))
-        max_bit_length_unaries = max(self.get_block_bit_lengths(encoded_block[halfway_point:]))
-        encoded_len = max_bit_length_remainders*halfway_point + max_bit_length_unaries * halfway_point + codeword
-        if self._keep_original == True:
-            if orig_len < encoded_len:
-                self._encoded_bit_length += orig_len
-            else:
-                self._encoded_bit_length += encoded_len
-        else:
-            self._encoded_bit_length += encoded_len
-        return 0
-
 class Golomb(Encoder):
     """
     Inherited class of Encoder with Golomb encoding implementation overriding
@@ -325,6 +258,29 @@ class Golomb(Encoder):
         else:
             self._encoded_bit_length += encoded_len
         return 0
+
+class GolombRice(Golomb):
+    """
+    Inherited class of Encoder with Golomb-Rice encoding implementation overriding
+    encode(), init() and update_bit_diff_diff() to account for differences
+    between golomb and generic method. Main difference between Golomb-Rice encoding and Golomb
+    is that the parameter b is the nearest exponent of 2 to the maximum value of the block.
+    """
+
+    def power_two(self, param):
+        if param <= 1:
+            return 2
+        possible_results = floor(log(param, 2)), ceil(log(param, 2))
+        return 2**int(min(possible_results, key= lambda z: abs(param-2**z)))
+
+    def encode(self, block):
+        maxval = max(block)
+        b = self.power_two(maxval)
+        golombs = [self.golomb(i, b) for i in block]
+        data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
+        return [[b], data]
+
+
 
 class DeltaGolomb(Golomb):
     def encode(self, block):
