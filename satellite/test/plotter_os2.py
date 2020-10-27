@@ -7,7 +7,7 @@ Altered to use os package and to work with current working directories.
 
 import os
 import matplotlib.pyplot as plt
-from encoder import Delta, Golomb
+from encoder import Delta, GolombRice
 import numpy as np
 import pandas as pd
 
@@ -31,7 +31,7 @@ def plot_settings(filename):
     plt.legend()
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
-    plt.title(f"Compression Ratio vs Block size (Golomb) - {filename}", fontsize = 24)
+    plt.title(f"Compression Ratio vs Block size (Golomb-Rice) - {filename}", fontsize = 24)
     plt.ylabel("Compression Ratio (%)", fontsize = 22)
     plt.xlabel("Block size", fontsize = 22)
     
@@ -84,11 +84,11 @@ for ind, path in enumerate(path_list):
     step = 2
     for i in range(2, 200, 2):
         print(i)
-        xtemp_encoder = Golomb(path, i, 'all', direction="x")
+        xtemp_encoder = GolombRice(path, i, 'all', direction="x")
         xtemp_encoder.encode_data(stats=False)
-        ytemp_encoder = Golomb(path, i, 'all', direction="y")
+        ytemp_encoder = GolombRice(path, i, 'all', direction="y")
         ytemp_encoder.encode_data(stats=False)
-        ztemp_encoder = Golomb(path, i, 'all', direction="z")
+        ztemp_encoder = GolombRice(path, i, 'all', direction="z")
         ztemp_encoder.encode_data(stats=False)
         xratios.append(xtemp_encoder.get_spacesaving_ratio())
         yratios.append(ytemp_encoder.get_spacesaving_ratio())
@@ -99,7 +99,7 @@ for ind, path in enumerate(path_list):
     plt.plot(range(2, maxblocksize, step), yratios, label = 'y-direction')
     plt.plot(range(2, maxblocksize, step), zratios, label = 'z-direction')
     plot_settings(filenames[ind])
-    plt.savefig(f'{plot_path}/golomb_compression_ratio_xyz_{maxblocksize}_{filenames[ind]}.png', dpi = 200)
+    plt.savefig(f'{plot_path}/golombrice_compression_ratio_xyz_{maxblocksize}_{filenames[ind]}.png', dpi = 200)
 
 # """
 # Code to print raw data for multiple files
