@@ -237,7 +237,7 @@ class Golomb(Encoder):
     
     def encode(self, block):
         if self._mode == "mean":
-            b = int(np.mean(block))
+            b = int(abs(np.mean(block)))
         elif self._mode == "max":
             b = max([abs(i) for i in block])
         elif self._mode == "min":
@@ -286,7 +286,7 @@ class GolombRice(Golomb):
 
     def encode(self, block):
         if self._mode == "mean":
-            b = int(np.mean([abs(i) for i in block]))
+            b = int(abs(np.mean(block)))
         elif self._mode == "max":
             b = max([abs(i) for i in block])
         elif self._mode == "min":
