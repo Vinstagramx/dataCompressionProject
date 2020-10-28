@@ -219,9 +219,20 @@ class Golomb(Encoder):
         self._block_regions = self.gen_samples(samples)
     
     def golomb(self, n, b):
-        q = n//b if n != 0 else 0
-        r = n - q*b if n!= 0 else 0
-        quot = ["1" for i in range(0,q)] + ["0"]
+        """
+        Perform Golomb encoding on number n with parameter b. If n is negative,
+        encode as if postive but flip sign bit on unary encoded quotient. At 
+        the end will need to reconstruct by assuming a negative quotient gives 
+        negative remainder. Have not attached a sign bit to the remainder to 
+        save space, because having the quotient intact is required for decoding
+        anyway.
+        """
+        q = abs(n)//b if n != 0 else 0 #make q, r strictly positive
+        if n < 0:
+            r = n + q*b
+        else:
+            r = n - q*b 
+        quot = ["1" for i in range(0,q)] + ["0"] 
         return ("".join(quot), r)
     
     def encode(self, block):
@@ -274,8 +285,13 @@ class GolombRice(Golomb):
         return 2**int(min(possible_results, key= lambda z: abs(param-2**z)))
 
     def encode(self, block):
-        maxval = max(abs(i) for i in block)
-        b = self.power_two(maxval)
+        if self._mode == "mean":
+            b = int(np.mean(block))
+        elif self._mode == "max":
+            b = max([abs(i) for i in block])
+        elif self._mode == "min":
+            b = min([abs(i) for i in block])
+        b = self.power_two(b)
         golombs = [self.golomb(i, b) for i in block]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
         return [[b], data]
