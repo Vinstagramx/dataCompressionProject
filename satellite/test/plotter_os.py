@@ -249,3 +249,30 @@ plt.plot(sample_sizes, adj_rat)
 pretty_graph("Sample Size", "Difference in Compression Ratio from all (%)", "Difference from compression ratio from using all samples in z-dir - C3_160313", 20)
 plt.gca().set_facecolor("#fffcf5")
 plt.legend(fontsize=18)
+#%% DELTA HISTOGRAMS
+delta_colours = ["#ffa600", "#ff6e54", "#dd5182"]
+compression_data = np.load("max_delta_ratios_all.npy")[0]
+new_comp_data = np.reshape(compression_data, (12,3))
+block_data = np.load("max_delta_blocks_all.npy")
+new_block_data = np.reshape(block_data, (12,3))
+tolerances = np.load("tolerances_delta_all.npy")[0]
+new_tolerances = np.reshape(tolerances, (12,3,2))
+plt.figure("Distribution of maximum compression ratios over datasets")
+n, bins, patches = plt.hist(new_comp_data, 20, stacked=True, color = delta_colours) #12 seems cool
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Maximum Compression Ratio (%)", "", "Distribution of Maximum Compression Ratio over datasets", 20)
+plt.legend(["x", "y", "z"], fontsize = 18)
+#%%
+x_block_data = []; y_block_data = []; z_block_data = []
+combined_data = [x_block_data, y_block_data, z_block_data]
+for i in range(12):
+    for j in range(3):
+        temp = new_tolerances[i,j,:]
+        print(temp, temp[0], temp[-1])
+        temp_range = [n for n in range(temp[0], temp[-1])]
+        combined_data[j] = combined_data[j] + temp_range
+n, bins, patches = plt.hist(combined_data, 42, stacked=True, color = delta_colours)
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Block Size of Maximum Compression", "", "Distribution of Block Size of 95% of Delta Maximum Compression Ratio over datasets", 20)
+plt.legend(["x", "y", "z"], fontsize = 18)
+    
