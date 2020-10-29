@@ -104,7 +104,7 @@ def master_testing(encoder, indexes, arg_list):
 #csv["Block"] = max_blocks
 #csv.to_csv("stats_prime.csv")
 #%% ALL MODES GOLOB MTF 
-modes = ["min", "max", "mean"]
+modes = ["min  ", "max", "mean"]
 max_ratios = []; max_blocks = []; tolerances = []
 for mode in modes:
     temp = master_testing(Golomb, [6,12], [7000, 14, mode])
