@@ -21,17 +21,17 @@ csv = pd.read_csv(stats_file)
 
 files = os.listdir(data_path)
 #%%
-# means = []; stds = []
-# for filename in files:
-#     file_path = os.path.join(data_path, filename)
-#     dirs = ["x", "y", "z"]
-#     for direction in dirs:
-#         temp_encoder = Delta(file_path, 100, "all", direction = direction)
-#         mean = np.mean(temp_encoder._current_data)
-#         means.append(mean)
-# #%%
-# csv["Means"] = [i/10000 for i in means]
-# print(csv)
+means = []; stds = []
+for filename in files:
+    file_path = os.path.join(data_path, filename)
+    dirs = ["x", "y", "z"]
+    for direction in dirs:
+        temp_encoder = Delta(file_path, 100, "all", direction = direction)
+        mean = np.mean(temp_encoder._current_data)
+        means.append(mean)
+#%%
+csv["Means"] = [i/10000 for i in means]
+print(csv)
 
 
 #%%
@@ -90,19 +90,19 @@ def master_testing(encoder, indexes, arg_list):
     return (max_ratios, max_blocks, tolerance_ranges)
 
 #%%
-# max_ratios = []; max_blocks = []; tolerances = []
+max_ratios = []; max_blocks = []; tolerances = []
 
-# temp = master_testing(Delta, [0,12], [7000, 14])
-# max_ratios.append(temp[0])
-# max_blocks.append(temp[1])
-# tolerances.append(temp[2])
+temp = master_testing(Delta, [0,12], [7000, 14])
+max_ratios.append(temp[0])
+max_blocks.append(temp[1])
+tolerances.append(temp[2])
 
-# np.save("max_delta_ratios_all", max_ratios)
-# np.save("max_delta_blocks_all", max_blocks)
-# np.save("tolerances_delta_all", tolerances)
-#csv["Delta"] = max_ratios
-#csv["Block"] = max_blocks
-#csv.to_csv("stats_prime.csv")
+np.save("max_delta_ratios_all", max_ratios)
+np.save("max_delta_blocks_all", max_blocks)
+np.save("tolerances_delta_all", tolerances)
+csv["Delta"] = max_ratios
+csv["Block"] = max_blocks
+csv.to_csv("stats_prime.csv")
 #%% ALL MODES GOLOB MTF 
 modes = ["min  ", "max", "mean"]
 max_ratios = []; max_blocks = []; tolerances = []
@@ -115,33 +115,33 @@ for mode in modes:
 np.save("max_golomb_ratios_6_12", max_ratios)
 np.save("max_golomb_blocks_6_12", max_blocks)
 np.save("golomb_tolerances_6_12", tolerances)
+%%
+up_to_18_ratios = list(np.load("max_ratios_to_18.npy"))
+up_to_18_blocks = list(np.load("max_blocks_to_18.npy"))
+from_19_csv = pd.read_csv("delta_compression_stats.csv")
+from_19_ratios = list(from_19_csv["Max Compression Ratio (Delta)"])
+from_19_blocks = list(from_19_csv["Block Size (Delta)"])
+ratio_data = up_to_18_ratios + from_19_ratios
+block_data = up_to_18_blocks + from_19_blocks
+
+csv["Delta"] = ratio_data
+csv["Block"] = block_data
 #%%
-# up_to_18_ratios = list(np.load("max_ratios_to_18.npy"))
-# up_to_18_blocks = list(np.load("max_blocks_to_18.npy"))
-# from_19_csv = pd.read_csv("delta_compression_stats.csv")
-# from_19_ratios = list(from_19_csv["Max Compression Ratio (Delta)"])
-# from_19_blocks = list(from_19_csv["Block Size (Delta)"])
-# ratio_data = up_to_18_ratios + from_19_ratios
-# block_data = up_to_18_blocks + from_19_blocks
+up_to_18_blocks = list(np.load("max_golomb_blocks_to_18_b.npy"))
+from_18_to_27_blocks = list(np.load("max_golomb_blocks_6_9.npy"))
+from_27_to_36_blocks = list(np.load("max_golomb_blocks_3.npy"))
+up_to_18_ratios = list(np.load("max_golomb_ratios_to_18_b.npy"))
+from_18_to_27_ratios = list(np.load("max_golomb_ratios_6_9.npy"))
+from_27_to_36_ratios = list(np.load("max_golomb_ratios_3.npy"))
+modes = ["min", "max", "mean"]
 
-# csv["Delta"] = ratio_data
-# csv["Block"] = block_data
-# #%%
-# up_to_18_blocks = list(np.load("max_golomb_blocks_to_18_b.npy"))
-# from_18_to_27_blocks = list(np.load("max_golomb_blocks_6_9.npy"))
-# from_27_to_36_blocks = list(np.load("max_golomb_blocks_3.npy"))
-# up_to_18_ratios = list(np.load("max_golomb_ratios_to_18_b.npy"))
-# from_18_to_27_ratios = list(np.load("max_golomb_ratios_6_9.npy"))
-# from_27_to_36_ratios = list(np.load("max_golomb_ratios_3.npy"))
-# modes = ["min", "max", "mean"]
-
-# for i in range(0,3):
-#     print(up_to_18_blocks[i], from_18_to_27_blocks[i], from_27_to_36_blocks[i])
-#     temp_blocks = list(up_to_18_blocks[i]) + list(from_18_to_27_blocks[i])+list(from_27_to_36_blocks[i])
-#     temp_ratios = list(up_to_18_ratios[i]) + list(from_18_to_27_ratios[i])+list(from_27_to_36_ratios[i])
-#     print(temp_ratios)
-#     csv["Golomb- "+modes[i]] = temp_ratios
-#     csv["Block size- " +modes[i]]= temp_blocks
-# #%%
-# csv.to_csv("stats_prime.csv")
+for i in range(0,3):
+    print(up_to_18_blocks[i], from_18_to_27_blocks[i], from_27_to_36_blocks[i])
+    temp_blocks = list(up_to_18_blocks[i]) + list(from_18_to_27_blocks[i])+list(from_27_to_36_blocks[i])
+    temp_ratios = list(up_to_18_ratios[i]) + list(from_18_to_27_ratios[i])+list(from_27_to_36_ratios[i])
+    print(temp_ratios)
+    csv["Golomb- "+modes[i]] = temp_ratios
+    csv["Block size- " +modes[i]]= temp_blocks
+#%%
+csv.to_csv("stats_prime.csv")
 
