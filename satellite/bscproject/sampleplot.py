@@ -27,12 +27,26 @@ Created on Thu Oct  1 12:19:47 2020
 #         power*=2
 #     print(f'closest exponent = {power}')
 #     return power
-from math import log, floor, ceil
+# from math import log, floor, ceil
 
-def power_two(param):
-    possible_results = floor(log(param, 2)), ceil(log(param, 2))
-    return 2**int(min(possible_results, key= lambda z: abs(param-2**z)))
+# def power_two(param):
+#     possible_results = floor(log(param, 2)), ceil(log(param, 2))
+#     return 2**int(min(possible_results, key= lambda z: abs(param-2**z)))
 
-x = 127
-y = 193
-print(power_two(x), power_two(y))
+# x = 127
+# y = 193
+# print(power_two(x), power_two(y))
+print(-20//15)
+print(-20//22)
+
+modes = ["min", "max", "mean"]
+max_ratios = []; max_blocks = []; tolerances = []
+for mode in modes:
+    temp = master_testing(Golomb, [6,12], [7000, 14, mode])
+    max_ratios.append(temp[0])
+    max_blocks.append(temp[1])
+    tolerances.append(temp[2])
+    
+np.save("max_golomb_ratios_6_12", max_ratios)
+np.save("max_golomb_blocks_6_12", max_blocks)
+np.save("golomb_tolerances_6_12", tolerances)
