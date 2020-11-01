@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <chrono>
-
+#include <numeric>
 
 struct Encoded
 {
@@ -21,15 +21,18 @@ class Encoder
 {
 
 private:
-	int m_blockSize;
+
 	std::string m_fileName;
 	int m_sampleNumber;
 	std::string m_direction;
 	std::vector<int> m_data{};
 	std::vector<int> m_sampleIndices{};
-	std::string m_mode;
+
 
 public:
+	int m_blockSize;
+	std::string m_mode;
+
 	Encoder(){ //default constructor
 		m_blockSize = 2;
 		m_fileName = "test.txt";
@@ -104,7 +107,7 @@ public:
 		return truncated;
 	}
 
-	int calcBitLength(Encoded encBlock){
+	virtual int calcBitLength(Encoded encBlock){
 		/*Calculate the bit length in an encoded block. First coverts list of codewords into bit lengths
 		then loops through every block of encoded data (can be more than 1 for golomb), calculates the bit
 		lengths of every element then multiplies the longest bit length by the block size to get the 
@@ -139,8 +142,15 @@ public:
 			Encoded encodedBlock;
 			block = std::vector<int>(m_data.begin() + sampleIndex, m_data.begin() + sampleIndex + m_blockSize); //use vector copy constructor to slice m_data and assign to block
 			encodedBlock = encode(block);
+
 			uncompressedBitLength += 14*m_blockSize; //assumes unencoded block are all 14 bit numbers 
-			compressedBitLength += calcBitLength(encodedBlock);
+			int encodedBlockBitLength = calcBitLength(encodedBlock);
+			if (encodedBlockBitLength > 14*m_blockSize){ //equivalent to unencoded flag in paper, i.e if encoded block is somehow BIGGER than unencoded, transmit unencoded
+				compressedBitLength += 14*m_blockSize;
+			}
+			else{
+				compressedBitLength += encodedBlockBitLength;
+			}
 		}
 		float compressionRatio = (1- compressedBitLength/uncompressedBitLength)*100;
 		std::cout << m_direction << " space saving ratio is: " << compressionRatio << "\n";
@@ -179,8 +189,9 @@ class Golomb : public Encoder
 		std::string unaryString = "0";
 		uint absN = std::abs(n);
 		for (int i=0; i < absN; i++){
-			unaryString.insert(unaryString.begin(),'1')
+			unaryString.insert(unaryString.begin(),'1');
 		}
+		std::cout << "n is: " << n << " and unary is: " << unaryString < "\n";
 		return unaryString;
 	}
 
@@ -196,8 +207,8 @@ class Golomb : public Encoder
 		}
 
 		if (m_mode == "mean"){
-			float average = std::accumulate(block.begin(), block.end(), 0.0)/block.size(); //find the average using acucmulate
-			b = std::lround(average); //need b to be int for golomb to work
+			float average = std::accumulate(absBlock.begin(), absBlock.end(), 0.0)/absBlock.size(); //find the average using acucmulate
+			b = std::round(average); //need b to be int for golomb to work
 		} else if (m_mode == "min"){
 			b = *std::min_element(absBlock.begin(), absBlock.end());
 		} else if (m_mode == "max"){
@@ -205,10 +216,10 @@ class Golomb : public Encoder
 		}
 
 		std::vector<int> remainderBlock;
-		std::vector<std::string> quotientBlock;
+		std::vector<int> quotientBlock;
 		for (int n=0; n< block.size(); n++){
 			int absN = std::abs(block[n]); //need absolute value for consistency between -ve and +ve
-			int q = absN/b; //check here, but should be integer division that rounds down/discards decimal part 
+			int q = (b == 0) ? 0 : absN/b; //check here, but should be integer division that rounds down/discards decimal part 
 			int r = 0;
 			if (n < 0){
 				r = block[n] + q*b;
@@ -217,8 +228,7 @@ class Golomb : public Encoder
 				r = block[n] - q*b;
 			}
 			remainderBlock.push_back(r);
-			std::string quot = unary(absN);
-			quotientBlock.push_back(quot);
+			quotientBlock.push_back(q);
 		}
 		encodedBlock.codewords.push_back(b);
 		encodedBlock.encodedData.push_back(quotientBlock);
@@ -226,12 +236,41 @@ class Golomb : public Encoder
 		return encodedBlock;
 	}
 
+	int calcBitLength(Encoded encBlock){
+		/*Overwritten for golomb because the first block in encoded data needs to be encoded in unary, the rest in binary*/
+		int codewordLength = 0;
+		for (int i=0; i < encBlock.codewords.size(); i++){ //for each codeword in codewords
+			int binLength = binaryString(encBlock.codewords[i]).length(); //get length of binary string of codeword
+			codewordLength += binLength;
+		}
+		int blockLength = 0;
+		std::vector<int> unaryBitLengths;
+		for (int i=0; i < encBlock.encodedData[0].size(); i++){ //assuming the first block is the quotient block to be encoded in unary
+			int unaryLength = unary(encBlock.encodedData[0][i]).length();
+			unaryBitLengths.push_back(unaryLength);
+		}
+		int maxUnaryVal =  *std::max_element(unaryBitLengths.begin(), unaryBitLengths.end());
+		blockLength += maxUnaryVal*m_blockSize;
+
+		for (int i=1; i < encBlock.encodedData.size(); i++){ //for each other block in encoded data
+			std::vector<int> bitLengths; //maybe optimise later by setting this to size of encodedData.size() and using indexing rather than push_back
+			for (int j=0; j < encBlock.encodedData[i].size(); j++){ //for each integer in block
+				int binLength = binaryString(encBlock.encodedData[i][j]).length();
+				bitLengths.push_back(binLength);
+			}
+			int maxVal = *std::max_element(bitLengths.begin(), bitLengths.end()); //use * as std::max_element returns iterator
+			blockLength += maxVal*m_blockSize; //block bit length should be the length of longest bit * size of block (implict truncation)
+		}
+		int sum = codewordLength + blockLength;
+		return sum;
+	}
+
 };
 
 
 
 int main(){
-	Delta d{15, "test.txt", 7000, "x"};
+	Golomb d{15, "test.txt", 7000, "x", "min"};
 	d.printParams();
 	d.loadData();
 	auto start = std::chrono::high_resolution_clock::now();
