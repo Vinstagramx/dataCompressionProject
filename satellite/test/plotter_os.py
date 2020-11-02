@@ -285,4 +285,93 @@ n, bins, patches = plt.hist(combined_data, 42, stacked=True, color = delta_colou
 plt.gca().set_facecolor("#fffcf5")
 pretty_graph("Block Size of Maximum Compression", "", "Distribution of Block Size of 95% of Delta Maximum Compression Ratio over datasets", 20)
 plt.legend(["x", "y", "z"], fontsize = 18)
+
+#%%GOLOMB HISTOGRAMS - combine data
+golomb_ratios_0_6 = np.load("max_golomb_ratios_0_6.npy")
+golomb_blocks_0_6 = np.load("max_golomb_blocks_0_6.npy")
+golomb_tolerances_0_6 = np.load("golomb_tolerances_0_6.npy")
+golomb_ratios_6_12 = np.load("max_golomb_ratios_6_12.npy")
+golomb_blocks_6_12 = np.load("max_golomb_blocks_6_12.npy")
+golomb_tolerances_6_12 = np.load("golomb_tolerances_6_12.npy")
+
+golomb_ratios_all = []; golomb_blocks_all = []; golomb_tolerances_all = []
+for i in range(3):
+    temp = golomb_ratios_0_6[i] + golomb_ratios_6_12[i]
+    temp2 = golomb_blocks_0_6[i] + golomb_blocks_6_12[i]
+    temp3 = golomb_tolerances_0_6[i] + golomb_tolerances_6_12[i]
+    golomb_ratios_all.append(temp)
+    golomb_blocks_all.append(temp2)
+    golomb_tolerances_all.append(temp3)
+
+np.save("max_golomb_ratios_all.npy", golomb_ratios_all)
+np.save("max_golomb_blocks_all.npy", golomb_blocks_all)
+np.save("max_golomb_tolerances_all.npy", golomb_tolerances_all)
+
+#%% Load data
+compression_data = np.load("max_golomb_ratios_all.npy")
+print(compression_data)
+block_data = np.load("max_golomb_blocks_all.npy")
+tolerances = np.load("max_golomb_tolerances_all.npy")
+print(tolerances)
+
+
+#%%plot comp rat histo
+golomb_colours = ["#ee3212", "#ef9400",  "#dddd33" ]
+min_data = []; max_data = []; mean_data = []
+combined_data = [min_data, max_data, mean_data]
+for i in range(3):
+    combined_data[i] = compression_data[i]
     
+n, bins, patches = plt.hist(combined_data, 42, stacked=True, color = golomb_colours)
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Maximum Compression Ratio (%)", "", "Distribution of Maximum Compression Ratios- Golomb", 20)
+plt.legend(["Min", "Max", "Mean"], fontsize = 18)
+
+#%%plot tolerances raio
+combined_data = [[],[],[]]
+for i in range(3):
+    temp_range_data = []
+    for j in range(12):
+        temp_range = tolerances[i][j]
+        temp_range_data = temp_range_data + [n for n in range(temp_range[0], temp_range[1])]
+    combined_data[i] = temp_range_data
+
+n, bins, patches = plt.hist(combined_data, 190, stacked=True, color = golomb_colours)
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Block Size of 95% of Maximum Compression", "", "Distribution of Block sizes of 95% of Maximum Compression Ratios- Golomb", 20)
+plt.legend(["Min", "Max", "Mean"], fontsize = 18)
+
+#%% GOLOBRICE
+
+compression_data = np.load("max_golombrice_ratios_0_12.npy")
+print(compression_data)
+block_data = np.load("max_golombrice_blocks_0_12.npy")
+tolerances = np.load("golombrice_tolerances_0_12.npy")
+print(tolerances)
+
+
+#%%plot comp rat histo
+golomb_colours = ["#ee3212", "#ef9400",  "#dddd33" ]
+min_data = []; max_data = []; mean_data = []
+combined_data = [min_data, max_data, mean_data]
+for i in range(3):
+    combined_data[i] = compression_data[i]
+    
+n, bins, patches = plt.hist(combined_data, 42, stacked=True, color = golomb_colours)
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Maximum Compression Ratio (%)", "", "Distribution of Maximum Compression Ratios- Golomb-Rice", 20)
+plt.legend(["Min", "Max", "Mean"], fontsize = 18)
+
+#%%plot tolerances raio
+combined_data = [[],[],[]]
+for i in range(3):
+    temp_range_data = []
+    for j in range(12):
+        temp_range = tolerances[i][j]
+        temp_range_data = temp_range_data + [n for n in range(temp_range[0], temp_range[1])]
+    combined_data[i] = temp_range_data
+
+n, bins, patches = plt.hist(combined_data, 70, stacked=True, color = golomb_colours)
+plt.gca().set_facecolor("#fffcf5")
+pretty_graph("Block Size of 95% of Maximum Compression", "", "Distribution of Block sizes of 95% of Maximum Compression Ratios- Golomb Rice", 20)
+plt.legend(["Min", "Max", "Mean"], fontsize = 18)

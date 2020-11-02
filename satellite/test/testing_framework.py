@@ -115,7 +115,7 @@ for mode in modes:
 np.save("max_golomb_ratios_6_12", max_ratios)
 np.save("max_golomb_blocks_6_12", max_blocks)
 np.save("golomb_tolerances_6_12", tolerances)
-%%
+#%%
 up_to_18_ratios = list(np.load("max_ratios_to_18.npy"))
 up_to_18_blocks = list(np.load("max_blocks_to_18.npy"))
 from_19_csv = pd.read_csv("delta_compression_stats.csv")
