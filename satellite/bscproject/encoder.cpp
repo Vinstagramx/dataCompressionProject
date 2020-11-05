@@ -33,6 +33,10 @@
 			std::cout << m_data[i] << "\n";
 		}
 	}
+
+	float Encoder::getCompressionRatio(){
+		return m_compressionRatio;
+	}
 	void Encoder::genSamples(bool random){
 		/*Create list of indices spaced by blocksize from which m_sampleIndices are selected and returned using PRNG*/
 		int maxSampleIndex = m_data.size()/m_blockSize;
@@ -122,6 +126,7 @@
 		}
 		float compressionRatio = (1- compressedBitLength/uncompressedBitLength)*100;
 		std::cout << m_direction << " space saving ratio is: " << compressionRatio << "\n";
+		m_compressionRatio = compressionRatio;
 		return 0;
 	}
 

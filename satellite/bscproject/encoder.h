@@ -26,13 +26,14 @@ public:
 
 	int m_blockSize;
 	std::string m_mode;
-	//Encoder();
+	float m_compressionRatio;
     Encoder();
     explicit Encoder(int bs, std::string f, int samples, std::string dir, std::string mode);
 	void setBlockSize(int bs);
 	void printParams();
 	void loadData();
 	void printData();
+	float getCompressionRatio();
 	void genSamples(bool random);
 	virtual Encoded encode(std::vector<int> &block);
 	std::string binaryString(int n);

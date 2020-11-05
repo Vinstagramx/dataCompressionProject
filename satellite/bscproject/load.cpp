@@ -52,3 +52,13 @@ void loop_through_vector(std::vector<int>& vec1){
 
 }
 
+int csv_save(std::string filePath, std::vector<float> vecIn){
+	std::ofstream outf{filePath, std::ios::out};
+	if (!outf){
+		std::cerr << "Error opening file " << filePath << " !\n"; 
+	}
+	for (int i=0; i<vecIn.size(); i++){
+		outf << vecIn[i] << "\n";
+	}
+	return 0;
+}
