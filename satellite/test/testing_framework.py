@@ -12,7 +12,7 @@ import os
 import pandas as pd
 
 cwd = os.getcwd()
-cwd = os.path.dirname(cwd)
+# cwd = os.path.dirname(cwd)
 data_folder = os.path.join(cwd, 'data')
 stats_file = os.path.join(cwd, 'test','stats_prime.csv')
 #%% 
@@ -100,21 +100,21 @@ tolerances.append(temp[2])
 np.save("max_delta_ratios_all", max_ratios)
 np.save("max_delta_blocks_all", max_blocks)
 np.save("tolerances_delta_all", tolerances)
-#csv["Delta"] = max_ratios
-#csv["Block"] = max_blocks
-#csv.to_csv("stats_prime.csv")
+csv["Delta"] = max_ratios
+csv["Block"] = max_blocks
+csv.to_csv("stats_prime.csv")
 #%% ALL MODES GOLOB MTF 
-modes = ["min", "max", "mean"]
+modes = ["min  ", "max", "mean"]
 max_ratios = []; max_blocks = []; tolerances = []
 for mode in modes:
-    temp = master_testing(Golomb, [0,6], [7000, 14, mode])
+    temp = master_testing(Golomb, [6,12], [7000, 14, mode])
     max_ratios.append(temp[0])
     max_blocks.append(temp[1])
     tolerances.append(temp[2])
     
-np.save("max_golomb_ratios_0_6", max_ratios)
-np.save("max_golomb_blocks_0_6", max_blocks)
-np.save("golomb_tolerances_0_6", tolerances)
+np.save("max_golomb_ratios_6_12", max_ratios)
+np.save("max_golomb_blocks_6_12", max_blocks)
+np.save("golomb_tolerances_6_12", tolerances)
 #%%
 up_to_18_ratios = list(np.load("max_ratios_to_18.npy"))
 up_to_18_blocks = list(np.load("max_blocks_to_18.npy"))
