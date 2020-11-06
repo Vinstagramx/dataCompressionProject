@@ -62,3 +62,21 @@ int csv_save(std::string filePath, std::vector<float> vecIn){
 	}
 	return 0;
 }
+
+std::vector<std::string> generateFileList(std::string dirListFile){
+	/*Given textfile with name of each file to be read on each line,
+	get all these file names and return a vector of strings.*/
+	std::vector<std::string> fileList;
+	std::string n;
+	std::ifstream infile;
+    	infile.open(dirListFile);
+
+	if(!infile){
+		std::cout << "The file could not be opened" << std::endl;
+        	exit(EXIT_FAILURE);
+	}
+	while (infile >> n){
+		fileList.push_back(n);
+	}
+	return fileList;
+}
