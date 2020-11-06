@@ -24,10 +24,27 @@
 		std::cout << "sample number: " << m_sampleNumber << " ";
 		std::cout << "direction: " << m_direction <<"\n";
 	}
-	void Encoder::loadData(){
-		csv_load(m_fileName, m_direction, m_data); //return by reference to load data into m_data
-		std::cout << "loaded data succesfully \n";
+
+	void Encoder::setDirection(std::string dir){
+		/*To let you adjust the directional data as you go so you call load data less*/
+		m_direction = dir;
+		if (m_direction == "x"){
+			m_data = m_allData[0];
+		}
+		if (m_direction == "y"){
+			m_data = m_allData[1];
+		}
+		if (m_direction == "z"){
+			m_data = m_allData[2];
+		}
 	}
+
+	void Encoder::loadData(){
+		csv_load(m_fileName, m_allData); //return by reference to load data into m_data
+		std::cout << "loaded data succesfully \n";
+		setDirection(m_direction); //set data to be whichever direction we initialised the class with
+	}
+
 	void Encoder::printData(){ //debug to check stuff is working
 		for (int i = 0; i < m_data.size(); i++){
 			std::cout << m_data[i] << "\n";

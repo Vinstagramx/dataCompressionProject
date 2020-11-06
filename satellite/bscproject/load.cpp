@@ -8,13 +8,13 @@
 
 void loop_through_vector(std::vector<int>& vec1);
 
-int csv_load(std::string filePath, std::string direction, std::vector<int> &vecIn){
+int csv_load(std::string filePath, std::vector<std::vector<int>> &vecIn){
 
     double n;
     int count = 0;
     int remainder;
 
-    std::vector<int> data;
+    std::vector<std::vector<int>> data{{},{},{}};
 
     std::ifstream infile;
     infile.open(filePath.c_str());
@@ -24,21 +24,13 @@ int csv_load(std::string filePath, std::string direction, std::vector<int> &vecI
         exit(EXIT_FAILURE);
     }
 
-    if(direction == "x"){
-        remainder = 1;
-    }
-    else if (direction == "y"){
-        remainder = 2;
-    }
-    else if (direction == "z"){
-        remainder = 3;
-    }
-
     while(infile >> n){
-        if(count % 4 == remainder){
-            int vec_in = std::lround(n / 7.8125e-3);
-            data.push_back(vec_in);
-        }
+	if (count%4 != 0){
+        	int vec_in = std::lround(n / 7.8125e-3);
+        	if (std::abs(vec_in) <  pow(2, 14)){
+			data[count%4-1].push_back(vec_in);
+		}
+	}
         count++;
     }
     vecIn = data;
