@@ -1,13 +1,5 @@
 #include "encoder.h"
 
-
-  //  Encoder::Encoder(){ //default constructor
-//		m_blockSize = 2;
-//		m_fileName = "test.txt";
-//		m_sampleNumber = 1000;
-//		m_direction = "x";
-	//	m_mode = "None";
-	//}
 	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None"){
         m_blockSize = bs;
 		m_fileName = f;
@@ -37,6 +29,7 @@
 		if (m_direction == "z"){
 			m_data = m_allData[2];
 		}
+		//std::cout << "first value in " << m_direction << "is:" << m_data[0] << "\n";
 	}
 
 	void Encoder::loadData(){
@@ -142,7 +135,7 @@
 			}
 		}
 		float compressionRatio = (1- compressedBitLength/uncompressedBitLength)*100;
-		std::cout << m_direction << " space saving ratio is: " << compressionRatio << "\n";
+		//std::cout << m_direction << " space saving ratio is: " << compressionRatio << "\n";
 		m_compressionRatio = compressionRatio;
 		return 0;
 	}
