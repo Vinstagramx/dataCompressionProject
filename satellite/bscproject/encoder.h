@@ -28,7 +28,9 @@ public:
 	std::string m_mode;
 	float m_compressionRatio;
     Encoder();
+   
     explicit Encoder(int bs, std::string f, int samples, std::string dir, std::string mode);
+	Encoder *makeEncoder(std::string choice);
 	void setBlockSize(int bs);
 	void printParams();
 	void setDirection(std::string dir);

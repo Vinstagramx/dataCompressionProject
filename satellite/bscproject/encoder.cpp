@@ -1,12 +1,22 @@
 #include "encoder.h"
 
 	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None"){
-        m_blockSize = bs;
+        	m_blockSize = bs;
 		m_fileName = f;
 		m_sampleNumber = samples;
 		m_direction = dir;
 		m_mode = mode;
 	}
+	
+	Encoder *Encoder::makeEncoder(std::string choice){
+		if (choice=="Delta"){
+			return new Delta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode);
+		}
+		else if (choice=="Golomb"){
+			return new Golomb(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode);
+		}
+	}
+
 	void Encoder::setBlockSize(int bs){ //can adjust blocksize inside object so don't need to load data multiple times
 		m_blockSize = bs;
 	}

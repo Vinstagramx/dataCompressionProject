@@ -1,3 +1,4 @@
+
 #include "encoder.h"
 #include <thread>
 #include <future>
@@ -22,17 +23,18 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
     std::vector<float> maxCompressionRatios;
 	std::string dirs[3] = {"x", "y", "z"};
 	for (int file=0; file < fileList.size(); file++){
-		std::vector<float> compressionRatios;
-		Delta d = Delta(3, fileList[file], 7000, "x", "None");
-		d.loadData();
+		Encoder temp = Encoder(3, fileList[file], 7000, "x", "None");
+		Encoder* d = temp.makeEncoder("Delta");
+		d->loadData();
 		for(int j=0; j<3; j++){
-			d.setDirection(dirs[j]);
+			std::vector<float> compressionRatios;
+			d->setDirection(dirs[j]);
 			std::cout<< "file: " << fileList[file] << " in direction: " << dirs[j] << "\n";
 			for (int i=3; i < 100; i++){
-				d.setBlockSize(i);
-				d.genSamples(false);
-				d.encodeData();
-				float compRat = d.getCompressionRatio();
+				d->setBlockSize(i);
+				d->genSamples(false);
+				d->encodeData();
+				float compRat = d->getCompressionRatio();
 				compressionRatios.push_back(compRat);
 				if (terminateEarly(compressionRatios)){
 					std::cout << "local max found, terminating \n";
@@ -47,6 +49,7 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
 }
 
 int main(){
+    
 	auto start = std::chrono::high_resolution_clock::now();
 	std::vector<std::string> filePaths = generateFileList("data/file_list.txt");
     std::vector<std::vector<std::string>> splitFilePaths{{}, {}, {}, {}};
