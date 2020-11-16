@@ -4,6 +4,12 @@
 #include <future>
 #include <chrono>
 
+//Forward declaration of constants with some default params - overwritten by command line arguments
+std::string ENC_TYPE = "Delta";
+int SAMPLE_SIZE = 7000;
+std::string MODE = "mean"; //can be "min" or "max"
+std::string OUTFILE = "data/default.txt";
+
 bool terminateEarly(std::vector<float> vecIn){
 	/*Slice input vector of float compression ratios to 7 (can change this later) then check if each entry is less
 	or same as previous and if it is return true. */
@@ -23,8 +29,8 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
     std::vector<float> maxCompressionRatios;
 	std::string dirs[3] = {"x", "y", "z"};
 	for (int file=0; file < fileList.size(); file++){
-		Encoder temp = Encoder(3, fileList[file], 7000, "x", "None");
-		Encoder* d = temp.makeEncoder("Delta");
+		Encoder temp = Encoder(3, fileList[file], SAMPLE_SIZE, "x", MODE);
+		Encoder* d = temp.makeEncoder(ENC_TYPE);
 		d->loadData();
 		for(int j=0; j<3; j++){
 			std::vector<float> compressionRatios;
@@ -48,35 +54,42 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
     return maxCompressionRatios;
 }
 
-int main(){
-    
+int main(int argc, char* argv[]){
+	if (argc != 5){
+		std::cout << "Please supply four command line arguments, encoder type, sample size, mode and outfile\n";
+		exit(EXIT_FAILURE);
+	}
+	ENC_TYPE = argv[1];
+	SAMPLE_SIZE = std::stoi(argv[2]);
+	MODE = argv[3];
+	OUTFILE = argv[4];
 	auto start = std::chrono::high_resolution_clock::now();
 	std::vector<std::string> filePaths = generateFileList("data/file_list.txt");
-    std::vector<std::vector<std::string>> splitFilePaths{{}, {}, {}, {}};
-    int listSize = filePaths.size();
-    int divis = listSize/4; //four cores
+	std::vector<std::vector<std::string>> splitFilePaths{{}, {}, {}, {}};
+	int listSize = filePaths.size();
+	int divis = listSize/4; //four cores
 	for (int i=0; i < 4; i++){ //split fileList into 4
-        std::vector<std::string> temp = std::vector<std::string>(filePaths.begin()+divis*i, filePaths.begin()+divis*(i+1));
-        splitFilePaths[i] = temp;
-    }
-    std::future<std::vector<float>> t1 = std::async(&split_mtf, splitFilePaths[0]);
-    std::future<std::vector<float>> t2 = std::async(&split_mtf, splitFilePaths[1]);
-    std::future<std::vector<float>> t3 = std::async(&split_mtf, splitFilePaths[2]);
-    std::future<std::vector<float>> t4 = std::async(&split_mtf, splitFilePaths[3]);
-    std::vector<float> compRat1 = t1.get();
-    std::vector<float> compRat2 = t2.get();
-    std::vector<float> compRat3 = t3.get();
-    std::vector<float> compRat4 = t4.get();
-    std::vector<std::vector<float>> combined{compRat1, compRat2, compRat3, compRat4};
-    std::vector<float> maxCompressionRatios;
-    for(int i=0; i<combined.size(); i++){
-        for(int j=0; j <combined[i].size(); j++){
-            maxCompressionRatios.push_back(combined[i][j]);
-        }
-    }
+        	std::vector<std::string> temp = std::vector<std::string>(filePaths.begin()+divis*i, filePaths.begin()+divis*(i+1));
+        	splitFilePaths[i] = temp;
+	}
+	std::future<std::vector<float>> t1 = std::async(&split_mtf, splitFilePaths[0]);
+	std::future<std::vector<float>> t2 = std::async(&split_mtf, splitFilePaths[1]);
+	std::future<std::vector<float>> t3 = std::async(&split_mtf, splitFilePaths[2]);
+	std::future<std::vector<float>> t4 = std::async(&split_mtf, splitFilePaths[3]);
+	std::vector<float> compRat1 = t1.get();
+	std::vector<float> compRat2 = t2.get();
+	std::vector<float> compRat3 = t3.get();
+	std::vector<float> compRat4 = t4.get();
+	std::vector<std::vector<float>> combined{compRat1, compRat2, compRat3, compRat4};
+	std::vector<float> maxCompressionRatios;
+	for(int i=0; i<combined.size(); i++){
+		for(int j=0; j <combined[i].size(); j++){
+            		maxCompressionRatios.push_back(combined[i][j]);
+        	}
+    	}
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::minutes>(stop-start);
 	std::cout << "finished successfully in " << duration.count() << " minutes \n";
-	csv_save("data/test_save.txt", maxCompressionRatios);
-    return 0;
+	csv_save(OUTFILE, maxCompressionRatios);
+	return 0;
 }
