@@ -64,7 +64,7 @@ int main(int argc, char* argv[]){
 	MODE = argv[3];
 	OUTFILE = argv[4];
 	auto start = std::chrono::high_resolution_clock::now();
-	std::vector<std::string> filePaths = generateFileList("data/file_list.txt");
+	std::vector<std::string> filePaths = generateFileList("file_list.txt");
 	std::vector<std::vector<std::string>> splitFilePaths{{}, {}, {}, {}};
 	int listSize = filePaths.size();
 	int divis = listSize/4; //four cores
