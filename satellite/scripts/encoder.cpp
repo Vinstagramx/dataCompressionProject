@@ -1,109 +1,63 @@
-<<<<<<< HEAD
-#include <iostream>
-#include <bitset>
-#include <math.h>
-#include <vector>
-#include "load.h"
-#include <cstdlib>
-#include <algorithm>
-#include <chrono>
-#include <numeric>
-
-struct Encoded
-{
-/*Enocded is a new data type to store all encoding related stuff into one object - like our [codword, [encoded data]]
-on Python but formalised. Codewords is vector to account for multiple codeword schemes, and encoded data is 
-multidimensional vector to account for multiple block schemes i.e Golomb/Golomb-based schemes*/
-std::vector<int> codewords;
-std::vector<std::vector<int>> encodedData;
-};
-
-class Encoder
-{
-
-private:
-
-	std::string m_fileName;
-	int m_sampleNumber;
-	std::string m_direction;
-	std::vector<int> m_data{};
-	std::vector<int> m_sampleIndices{};
-
-
-public:
-	int m_blockSize;
-	std::string m_mode;
-
-	Encoder(){ //default constructor
-		m_blockSize = 2;
-		m_fileName = "test.txt";
-		m_sampleNumber = 1000;
-		m_direction = "x";
-		m_mode = "None";
-	}
-	explicit Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None"){
-		m_blockSize = bs;
-=======
 #include "encoder.h"
 
-
-  //  Encoder::Encoder(){ //default constructor
-//		m_blockSize = 2;
-//		m_fileName = "test.txt";
-//		m_sampleNumber = 1000;
-//		m_direction = "x";
-	//	m_mode = "None";
-	//}
 	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None"){
-        m_blockSize = bs;
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
+        	m_blockSize = bs;
 		m_fileName = f;
 		m_sampleNumber = samples;
 		m_direction = dir;
 		m_mode = mode;
 	}
-<<<<<<< HEAD
-	void setBlockSize(int bs){ //can adjust blocksize inside object so don't need to load data multiple times
-		m_blockSize = bs;
+	
+	Encoder *Encoder::makeEncoder(std::string choice){
+		if (choice=="Delta"){
+			return new Delta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode);
+		}
+		else if (choice=="Golomb"){
+			return new Golomb(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode);
+		}
 	}
-	void printParams(){ //debug function to check stuff is working
-=======
+
 	void Encoder::setBlockSize(int bs){ //can adjust blocksize inside object so don't need to load data multiple times
 		m_blockSize = bs;
 	}
 	void Encoder::printParams(){ //debug function to check stuff is working
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		std::cout << "block size: " << m_blockSize << " ";
 		std::cout << "file: " << m_fileName << " ";
 		std::cout << "sample number: " << m_sampleNumber << " ";
 		std::cout << "direction: " << m_direction <<"\n";
 	}
-<<<<<<< HEAD
-	void loadData(){
-		csv_load(m_fileName, m_direction, m_data); //return by reference to load data into m_data
-		std::cout << "loaded data succesfully \n";
+
+	void Encoder::setDirection(std::string dir){
+		/*To let you adjust the directional data as you go so you call load data less*/
+		m_direction = dir;
+		if (m_direction == "x"){
+			m_data = m_allData[0];
+		}
+		if (m_direction == "y"){
+			m_data = m_allData[1];
+		}
+		if (m_direction == "z"){
+			m_data = m_allData[2];
+		}
+		//std::cout << "first value in " << m_direction << "is:" << m_data[0] << "\n";
 	}
-	void printData(){ //debug to check stuff is working
-=======
+
 	void Encoder::loadData(){
-		csv_load(m_fileName, m_direction, m_data); //return by reference to load data into m_data
+		csv_load(m_fileName, m_allData); //return by reference to load data into m_data
 		std::cout << "loaded data succesfully \n";
+		setDirection(m_direction); //set data to be whichever direction we initialised the class with
 	}
+
 	void Encoder::printData(){ //debug to check stuff is working
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		for (int i = 0; i < m_data.size(); i++){
 			std::cout << m_data[i] << "\n";
 		}
 	}
-<<<<<<< HEAD
-	void genSamples(bool random = false){
-=======
 
 	float Encoder::getCompressionRatio(){
 		return m_compressionRatio;
 	}
 	void Encoder::genSamples(bool random){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		/*Create list of indices spaced by blocksize from which m_sampleIndices are selected and returned using PRNG*/
 		int maxSampleIndex = m_data.size()/m_blockSize;
 		for (int i = 0; i < maxSampleIndex; i++){
@@ -115,22 +69,14 @@ public:
 		//std::cout <<"sample indices is length " << m_sampleIndices.size() << "\n";
 	}
 
-<<<<<<< HEAD
-	virtual Encoded encode(std::vector<int> &block){ //method to be overwritten by specific encoding schemes later
-=======
 	Encoded Encoder::encode(std::vector<int> &block){ //method to be overwritten by specific encoding schemes later
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		Encoded encodedBlock;
 		encodedBlock.codewords = std::vector<int>{0}; //initialise this way to avoid seg fault
 		encodedBlock.encodedData = std::vector<std::vector<int>>{block}; //ditto
 		return encodedBlock;
 	}
 
-<<<<<<< HEAD
-	std::string binaryString(int n){
-=======
 	std::string Encoder::binaryString(int n){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		/*Return the smallest binary representation of a given integer n with added sign bit at the end*/
 		char signBit = '0';
 		if (n < 0){
@@ -153,11 +99,7 @@ public:
 		return truncated;
 	}
 
-<<<<<<< HEAD
-	virtual int calcBitLength(Encoded encBlock){
-=======
 	int Encoder::calcBitLength(Encoded encBlock){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		/*Calculate the bit length in an encoded block. First coverts list of codewords into bit lengths
 		then loops through every block of encoded data (can be more than 1 for golomb), calculates the bit
 		lengths of every element then multiplies the longest bit length by the block size to get the 
@@ -182,11 +124,7 @@ public:
 		return sum;
 	}
 
-<<<<<<< HEAD
-	int encodeData(){
-=======
 	int Encoder::encodeData(){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		/*Big method to handle generic encoding process for the data*/
 		int uncompressedBitLength = 0; //total bit length of uncompressed data
 		float compressedBitLength = 0; //total bit length of compressed data, is float so division later returns float
@@ -207,26 +145,13 @@ public:
 			}
 		}
 		float compressionRatio = (1- compressedBitLength/uncompressedBitLength)*100;
-		std::cout << m_direction << " space saving ratio is: " << compressionRatio << "\n";
-<<<<<<< HEAD
-		return 0;
-	}
-};
-
-class Delta : public Encoder
-{
-
-public:
-	using Encoder::Encoder; //inher
-	Encoded encode(std::vector<int> &block){
-=======
+		//std::cout << m_direction << " space saving ratio is: " << compressionRatio << "\n";
 		m_compressionRatio = compressionRatio;
 		return 0;
 	}
 
 
 	Encoded Delta::encode(std::vector<int> &block){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		/*Overwrite the encode method with delta specific implementation - subtract each element
 		from the previous element then return the encoded block.*/
 		int codeword = block[0];
@@ -242,37 +167,19 @@ public:
 	}
 
 
-<<<<<<< HEAD
-};
-
-class Golomb : public Encoder
-{
-	using Encoder::Encoder;
-
-	std::string unary(int n){
-=======
 
 
 	std::string Golomb::unary(int n){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		std::string unaryString = "0";
 		uint absN = std::abs(n);
 		for (int i=0; i < absN; i++){
 			unaryString.insert(unaryString.begin(),'1');
 		}
-<<<<<<< HEAD
-		std::cout << "n is: " << n << " and unary is: " << unaryString < "\n";
-		return unaryString;
-	}
-
-	Encoded encode(std::vector<int> &block){
-=======
 		//std::cout << "n is: " << n << " and unary is: " << unaryString < "\n";
 		return unaryString;
 	}
 
 	Encoded Golomb::encode(std::vector<int> &block){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		/*Overwrite the encode method with Golomb specific implementation - divide each number
 		in block by fixed paramter b which is determined by the mode. Store the quotient q in
 		unary in one block of instance of Encoded and the remainders in another.*/
@@ -284,11 +191,7 @@ class Golomb : public Encoder
 		}
 
 		if (m_mode == "mean"){
-<<<<<<< HEAD
-			float average = std::accumulate(absBlock.begin(), absBlock.end(), 0.0)/absBlock.size(); //find the average using acucmulate
-=======
 			float average = std::accumulate(block.begin(), block.end(), 0.0)/block.size(); //find the average using acucmulate
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 			b = std::round(average); //need b to be int for golomb to work
 		} else if (m_mode == "min"){
 			b = *std::min_element(absBlock.begin(), absBlock.end());
@@ -317,11 +220,7 @@ class Golomb : public Encoder
 		return encodedBlock;
 	}
 
-<<<<<<< HEAD
-	int calcBitLength(Encoded encBlock){
-=======
 	int Golomb::calcBitLength(Encoded encBlock){
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
 		/*Overwritten for golomb because the first block in encoded data needs to be encoded in unary, the rest in binary*/
 		int codewordLength = 0;
 		for (int i=0; i < encBlock.codewords.size(); i++){ //for each codeword in codewords
@@ -349,26 +248,3 @@ class Golomb : public Encoder
 		int sum = codewordLength + blockLength;
 		return sum;
 	}
-<<<<<<< HEAD
-
-};
-
-
-
-int main(){
-	Golomb d{15, "test.txt", 7000, "x", "min"};
-	d.printParams();
-	d.loadData();
-	auto start = std::chrono::high_resolution_clock::now();
-	for (int i=3; i < 100; i++){
-		std::cout << "Block Size: " << i << "\n";
-		d.setBlockSize(i);
-		d.genSamples();
-		d.encodeData();
-	}
-	auto stop = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-	std::cout << "Finished in " << duration.count() << " seconds \n";
-}
-=======
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7

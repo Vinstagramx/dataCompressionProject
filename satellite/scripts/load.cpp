@@ -44,8 +44,6 @@ void loop_through_vector(std::vector<int>& vec1){
 
 }
 
-<<<<<<< HEAD
-=======
 int csv_save(std::string filePath, std::vector<float> vecIn){
 	std::ofstream outf{filePath, std::ios::out};
 	if (!outf){
@@ -74,4 +72,3 @@ std::vector<std::string> generateFileList(std::string dirListFile){
 	}
 	return fileList;
 }
->>>>>>> a8d2b66f34b91161ded38e26d2f844963d1494b7
