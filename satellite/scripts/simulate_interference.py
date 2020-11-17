@@ -11,8 +11,9 @@ import matplotlib.pyplot as plt
 cwd = os.getcwd()
 parent_dir = os.path.dirname(cwd)
 cwd = os.path.dirname(cwd)
-datafile = 'C3_160313.FS.FULLRES.txt'
+datafile = 'C4_160313.FS.FULLRES.txt'
 DATA_PATH = os.path.join(cwd, 'data', datafile)
+OUTFILE = "C4_160313_modified.txt"
 
 time_interval = 0.14866719 
 
@@ -47,7 +48,19 @@ def simulate_interference(wave_data, data):
         modified_data.append(temp_data)
     return (time, modified_data)
 
+def save(data):
+    time = data[0]
+    f = open(OUTFILE, "w")
+    for i in range(len(time)):
+        string = str(time[i]) + "  " + str(data[1][0][i]) + "  " + str(data[1][1][i]) + "  " + str(data[1][2][i]) + "\n"
+        f.write(string)
+    f.close()
+
 data = load_data(DATA_PATH)
-mod = simulate_interference([(1,0,1), (0.5,0,2)], data)
+mod = simulate_interference([(1,0,5), (0.5,0,1)], data)
+save(mod)
 plt.plot(mod[0], mod[1][0])
 plt.plot(mod[0], data[0])
+
+
+        
