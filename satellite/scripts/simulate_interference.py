@@ -54,6 +54,13 @@ def save(data, out):
         f.write(string)
     f.close()
 
+
+#plt.plot(mod[0], mod[1][0])
+data = load_data(DATAPATH)
+mod = simulate_interference([(100,0,5), data]
+plt.plot(mod[0], data[0])
+
+#%%
 file_list = open("file_list.txt", "r").readlines()
 #print(file_list)
 edited_file_list = [i[4:29].strip("/") for i in file_list]
@@ -68,8 +75,7 @@ for file in edited_file_list:
     data = load_data(DATA_PATH)
     mod = simulate_interference([(1,0,5)], data)
     save(mod, OUTFILE)
-    #plt.plot(mod[0], mod[1][0])
-   # plt.plot(mod[0], data[0])
+    
 
 
         

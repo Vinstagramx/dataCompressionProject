@@ -112,7 +112,7 @@ file_dir_list = []
 std_list = []
 #rawdata_plotpath = os.path.join(osplot_path, 'data')
 #csv_path = os.path.join(cwd, 'test')
-for ind, path in enumerate(path_list):
+for ind, path in enumerate(path_list[:1]):
     d = Delta(path, 20, 1000, direction="x")
     d.filter_data()
     time_interval = 0.14866719 #time interval between every reading (in seconds) - FIXED
@@ -122,22 +122,25 @@ for ind, path in enumerate(path_list):
     for index, i  in enumerate(raw_data):
         figure = plt.gcf()  # get current figure
         figure.set_size_inches(18, 10)
-        i = [value for value in i if abs(value) < (2**12) / 7.8125e-3]
+        i = [value*7.8125e-3 for value in i if abs(value) < (2**14)]
         compressed = []
         for j in range(1,len(i)):
-            compressed.append(i[j]-i[j-1])
+            compressed.append(abs(i[j]-i[j-1]))
         std = np.std(i)
         print(f"{dirs[index]} standard dev is: {std}nT")
         timeseries = np.asarray(range(len(i))) * time_interval
         maxval = max(timeseries)
         file_dir_list.append(f'{filenames[ind]} {coord[index]}')
         std_list.append(std)
-        plt.plot(timeseries[1:], compressed, label = dirs[index])
+        print(max(compressed))
+        print(np.mean(compressed))
+    plt.hist(compressed, 100)
+    #plt.plot(timeseries[1:], compressed, label = dirs[index])
 
-    plot_settings(maxval, filenames[ind])   
-    plt.savefig(f'{plot_path}/deltas_{filenames[ind]}.png', dpi = 200)
+    #plot_settings(maxval, filenames[ind])   
+    #plt.savefig(f'{plot_path}/deltas_{filenames[ind]}.png', dpi = 200)
 #    plt.show() 
-    plt.clf()
+    #plt.clf()
 # g = {'File and Direction': file_dir_list, 'Standard Deviation (nT)': std_list}
 # df = pd.DataFrame(data = g)
 # df.to_csv(f'{csv_path}/stats.csv')
