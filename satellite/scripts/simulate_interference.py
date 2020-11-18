@@ -8,6 +8,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 cwd = os.getcwd()
 parent_dir = os.path.dirname(cwd)
 cwd = os.path.dirname(cwd)
@@ -19,7 +20,7 @@ time_interval = 0.14866719
 
 def load_data(path):
         data = np.loadtxt(path).T
-        fixed_x = round(data[1]/7.8125e-3); fixed_y = round(data[2]/7.8125e-3); fixed_z = round(data[3]/7.8125e-3)
+        fixed_x = [round(x) for x in data[1]/7.8125e-3]; fixed_y = [round(y) for y in data[2]/7.8125e-3]; fixed_z = [round(z) for z in data[3]/7.8125e-3]
         fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32) #does this round down or nearest - if we can't reconstruct data look at this 
         return fixed_array
 
