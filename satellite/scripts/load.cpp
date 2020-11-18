@@ -27,7 +27,7 @@ int csv_load(std::string filePath, std::vector<std::vector<int>> &vecIn){
     while(infile >> n){
 	if (count%4 != 0){
         	int vec_in = std::lround(n / 7.8125e-3);
-        	if (std::abs(vec_in) <  pow(2, 14)){
+		if (std::abs(vec_in) <  pow(2, 17)){ //change this to 16?
 			data[count%4-1].push_back(vec_in); //i think this isn't working - maybe only taking one value
 		}
 	}

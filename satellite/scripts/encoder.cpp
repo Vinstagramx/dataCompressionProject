@@ -1,5 +1,5 @@
 #include "encoder.h"
-
+//TO DO - MAKE THE ENCODER TAKE SOME KINDA BIT LENGTH PARAMETER SO IT'S SUITABLE FOR MODIFIED DATA
 	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None"){
         	m_blockSize = bs;
 		m_fileName = f;
@@ -88,8 +88,8 @@
 			truncated = "0";
 		}
 		else{ //could improve this with recursive definition on stack overflow
-			std::string binary = std::bitset<14>(a).to_string();//maximum representable measurement is 14 bits
-			int loop = 0;
+			std::string binary = std::bitset<17>(a).to_string();//maximum representable measurement is 14 bits
+			int loop = 0; //change 14/16 bits ? weird seg fault
 			while (binary[loop] != '1'){ //if 0 then is not significant bit
 				++loop;
 				}
@@ -135,10 +135,10 @@
 			block = std::vector<int>(m_data.begin() + sampleIndex, m_data.begin() + sampleIndex + m_blockSize); //use vector copy constructor to slice m_data and assign to block
 			encodedBlock = encode(block);
 
-			uncompressedBitLength += 14*m_blockSize; //assumes unencoded block are all 14 bit numbers 
+			uncompressedBitLength += 17*m_blockSize; //assumes unencoded block are all 14 bit numbers 
 			int encodedBlockBitLength = calcBitLength(encodedBlock);
-			if (encodedBlockBitLength > 14*m_blockSize){ //equivalent to unencoded flag in paper, i.e if encoded block is somehow BIGGER than unencoded, transmit unencoded
-				compressedBitLength += 14*m_blockSize;
+			if (encodedBlockBitLength > 17*m_blockSize){ //equivalent to unencoded flag in paper, i.e if encoded block is somehow BIGGER than unencoded, transmit unencoded
+				compressedBitLength += 17*m_blockSize;
 			}
 			else{
 				compressedBitLength += encodedBlockBitLength;
