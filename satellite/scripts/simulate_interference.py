@@ -19,7 +19,7 @@ time_interval = 0.14866719
 
 def load_data(path):
         data = np.loadtxt(path).T
-        fixed_x = data[1]/7.8125e-3; fixed_y = data[2]/7.8125e-3; fixed_z = data[3]/7.8125e-3
+        fixed_x = round(data[1]/7.8125e-3); fixed_y = round(data[2]/7.8125e-3); fixed_z = round(data[3]/7.8125e-3)
         fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32) #does this round down or nearest - if we can't reconstruct data look at this 
         return fixed_array
 
@@ -57,7 +57,7 @@ def save(data):
     f.close()
 
 data = load_data(DATA_PATH)
-mod = simulate_interference([(1,0,5), (0.5,0,1)], data)
+mod = simulate_interference([(1,0,5)], data)
 save(mod)
 plt.plot(mod[0], mod[1][0])
 plt.plot(mod[0], data[0])

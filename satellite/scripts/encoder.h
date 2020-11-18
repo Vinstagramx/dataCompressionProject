@@ -27,9 +27,10 @@ public:
 	int m_blockSize;
 	std::string m_mode;
 	float m_compressionRatio;
+	int m_bits;
     Encoder();
    
-    explicit Encoder(int bs, std::string f, int samples, std::string dir, std::string mode);
+    explicit Encoder(int bs, std::string f, int samples, std::string dir, std::string mode, int bits);
 	Encoder *makeEncoder(std::string choice);
 	void setBlockSize(int bs);
 	void printParams();

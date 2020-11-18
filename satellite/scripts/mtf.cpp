@@ -12,6 +12,7 @@ int SAMPLE_SIZE = 7000;
 std::string MODE = "mean"; //can be "min" or "max"
 std::string OUTFILE = "data/default.txt";
 std::string FILELIST = "file_list.txt";
+int BITS = 14;
 
 bool terminateEarly(std::vector<float> vecIn){
 	/*Slice input vector of float compression ratios to 7 (can change this later) then check if each entry is less
@@ -32,7 +33,7 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
     std::vector<float> maxCompressionRatios;
 	std::string dirs[3] = {"x", "y", "z"};
 	for (int file=0; file < fileList.size(); file++){
-		Encoder temp = Encoder(3, fileList[file], SAMPLE_SIZE, "x", MODE);
+		Encoder temp = Encoder(3, fileList[file], SAMPLE_SIZE, "x", MODE, BITS);
 		Encoder* d = temp.makeEncoder(ENC_TYPE);
 		d->loadData();
 		for(int j=0; j<3; j++){
@@ -58,8 +59,8 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
 }
 
 int main(int argc, char* argv[]){
-	if (argc != 6){
-		std::cout << "Please supply five command line arguments, encoder type, sample size, mode, outfile and file list\n";
+	if (argc != 7){
+		std::cout << "Please supply six command line arguments, encoder type, sample size, mode, outfile, file list, and bit length\n";
 		exit(EXIT_FAILURE);
 	}
 	ENC_TYPE = argv[1];
@@ -67,6 +68,7 @@ int main(int argc, char* argv[]){
 	MODE = argv[3];
 	OUTFILE = argv[4];
 	FILELIST = argv[5];
+	BITS = std::stoi(argv[6]);
 	auto start = std::chrono::high_resolution_clock::now();
 	std::vector<std::string> filePaths = generateFileList(FILELIST);
 	std::vector<std::vector<std::string>> splitFilePaths{{}, {}, {}, {}};

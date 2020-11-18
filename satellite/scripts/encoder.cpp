@@ -1,19 +1,20 @@
 #include "encoder.h"
 //TO DO - MAKE THE ENCODER TAKE SOME KINDA BIT LENGTH PARAMETER SO IT'S SUITABLE FOR MODIFIED DATA
-	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None"){
-        	m_blockSize = bs;
+	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None", int bits = 17){
+		m_blockSize = bs;
 		m_fileName = f;
 		m_sampleNumber = samples;
 		m_direction = dir;
 		m_mode = mode;
+		m_bits = bits;
 	}
 	
 	Encoder *Encoder::makeEncoder(std::string choice){
 		if (choice=="Delta"){
-			return new Delta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode);
+			return new Delta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
 		}
 		else if (choice=="Golomb"){
-			return new Golomb(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode);
+			return new Golomb(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
 		}
 	}
 
@@ -24,7 +25,9 @@
 		std::cout << "block size: " << m_blockSize << " ";
 		std::cout << "file: " << m_fileName << " ";
 		std::cout << "sample number: " << m_sampleNumber << " ";
-		std::cout << "direction: " << m_direction <<"\n";
+		std::cout << "direction: " << m_direction <<" ";
+		std::cout << "mode: " << m_mode << " ";
+		std::cout << "bit length " << m_bits << "\n";
 	}
 
 	void Encoder::setDirection(std::string dir){
@@ -43,7 +46,7 @@
 	}
 
 	void Encoder::loadData(){
-		csv_load(m_fileName, m_allData); //return by reference to load data into m_data
+		csv_load(m_fileName, m_allData, m_bits); //return by reference to load data into m_data
 		std::cout << "loaded data succesfully \n";
 		setDirection(m_direction); //set data to be whichever direction we initialised the class with
 	}
@@ -88,7 +91,7 @@
 			truncated = "0";
 		}
 		else{ //could improve this with recursive definition on stack overflow
-			std::string binary = std::bitset<17>(a).to_string();//maximum representable measurement is 14 bits
+			std::string binary = std::bitset<18>(a).to_string();//maximum representable measurement is 14 bits
 			int loop = 0; //change 14/16 bits ? weird seg fault
 			while (binary[loop] != '1'){ //if 0 then is not significant bit
 				++loop;
@@ -135,10 +138,10 @@
 			block = std::vector<int>(m_data.begin() + sampleIndex, m_data.begin() + sampleIndex + m_blockSize); //use vector copy constructor to slice m_data and assign to block
 			encodedBlock = encode(block);
 
-			uncompressedBitLength += 17*m_blockSize; //assumes unencoded block are all 14 bit numbers 
+			uncompressedBitLength += m_bits*m_blockSize; //assumes unencoded block are all 14 bit numbers 
 			int encodedBlockBitLength = calcBitLength(encodedBlock);
-			if (encodedBlockBitLength > 17*m_blockSize){ //equivalent to unencoded flag in paper, i.e if encoded block is somehow BIGGER than unencoded, transmit unencoded
-				compressedBitLength += 17*m_blockSize;
+			if (encodedBlockBitLength > m_bits*m_blockSize){ //equivalent to unencoded flag in paper, i.e if encoded block is somehow BIGGER than unencoded, transmit unencoded
+				compressedBitLength += m_bits*m_blockSize;
 			}
 			else{
 				compressedBitLength += encodedBlockBitLength;
