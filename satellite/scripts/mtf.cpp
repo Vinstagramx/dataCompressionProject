@@ -5,7 +5,7 @@
 #include <chrono>
 /* How to run the file:
 	To input arguments use:
-    $./mtf "Enocder type (Delta/Golomb)" "Sample Size" "Mode" "Outfile path" */
+    $./mtf "Encoder type (Delta/Golomb)" "Sample Size" "Mode" "Outfile path" */
 //Forward declaration of constants with some default params - overwritten by command line arguments
 std::string ENC_TYPE = "Delta";
 int SAMPLE_SIZE = 7000;
