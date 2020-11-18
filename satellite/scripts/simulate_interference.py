@@ -12,9 +12,6 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 cwd = os.getcwd()
 parent_dir = os.path.dirname(cwd)
 cwd = os.path.dirname(cwd)
-datafile = 'C4_160313.FS.FULLRES.txt'
-DATA_PATH = os.path.join(cwd, 'data', datafile)
-OUTFILE = "C4_160313_modified.txt"
 
 time_interval = 0.14866719 
 
@@ -49,19 +46,30 @@ def simulate_interference(wave_data, data):
         modified_data.append(temp_data)
     return (time, modified_data)
 
-def save(data):
+def save(data, out):
     time = data[0]
-    f = open(OUTFILE, "w")
+    f = open(out, "w")
     for i in range(len(time)):
         string = str(time[i]) + "  " + str(data[1][0][i]) + "  " + str(data[1][1][i]) + "  " + str(data[1][2][i]) + "\n"
         f.write(string)
     f.close()
 
-data = load_data(DATA_PATH)
-mod = simulate_interference([(1,0,5)], data)
-save(mod)
-plt.plot(mod[0], mod[1][0])
-plt.plot(mod[0], data[0])
+file_list = open("file_list.txt", "r").readlines()
+#print(file_list)
+edited_file_list = [i[4:29].strip("/") for i in file_list]
+print(edited_file_list)
+
+for file in edited_file_list:
+    #datafile = 'C4_160313.FS.FULLRES.txt'
+
+    DATA_PATH = os.path.join(cwd, 'data', file)
+    OUTFILE = file[:9]+"_modified.txt"
+    print(OUTFILE)
+    data = load_data(DATA_PATH)
+    mod = simulate_interference([(1,0,5)], data)
+    save(mod, OUTFILE)
+    #plt.plot(mod[0], mod[1][0])
+   # plt.plot(mod[0], data[0])
 
 
         
