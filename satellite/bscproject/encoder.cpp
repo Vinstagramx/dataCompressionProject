@@ -223,3 +223,23 @@
 		int sum = codewordLength + blockLength;
 		return sum;
 	}
+
+	Encoded Simple8b::encode(std::vector<int> &block){
+		int codeword = block[0];
+		Encoded encodedBlock;
+		std::vector<int> encodedVec;
+		std::vector<int> encodedFlags;
+		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
+		for (int i=1; i<block.size()-1; i++){
+			encodedVec.push_back(block[i]-block[i-1]);
+		}
+		encodedBlock.codewords = std::vector<int>{codeword};
+		/* need to overwrite the bit lengths function, different sub blocks within a block, whose lengths need to be measured */
+		for (int j=0; j < encodedVec.size(); j++){ //for each integer in block
+			int binLength = binaryString(encBlock.encodedData[i][j]).length();
+			bitLengths.push_back(binLength);
+		}
+		
+		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedVec};
+		return encodedBlock;
+	}
