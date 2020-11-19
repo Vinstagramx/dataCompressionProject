@@ -61,4 +61,12 @@ class Golomb : public Encoder
 	int calcBitLength(Encoded encBlock);
 };
 
+class StepDelta : public Encoder
+{
+    using Encoder::Encoder;
+	Encoded encode(std::vector<int> &block);
+
+};
+
 #endif
+

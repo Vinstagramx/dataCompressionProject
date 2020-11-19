@@ -16,6 +16,9 @@
 		else if (choice=="Golomb"){
 			return new Golomb(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
 		}
+		else if (choice=="StepDelta"){
+			return new StepDelta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+		}
 	}
 
 	void Encoder::setBlockSize(int bs){ //can adjust blocksize inside object so don't need to load data multiple times
@@ -250,4 +253,63 @@
 		}
 		int sum = codewordLength + blockLength;
 		return sum;
+	}
+
+	Encoded StepDelta::encode(std::vector<int> &block){
+		/*Define a filter value. Then loop through the block until there's a big jump. Determine the direction and 
+		that sets which one is the high stream codeword & initial value, and which is the low stream codeword and 
+		initial value. Then loop through and encode by checking if there's a jump then switching to high or low
+		stream and subtracting the previous value in that high or low stream. Note that this might reduce performance by 
+		more than expected as i've effectively increased the time between samples by splitting (so more oppurtunity for 
+		variance into two streams*/
+		float filter = 3/7.8125e-3; //a jump of 3nT in scaled units
+		int smallCodeword = block[0];
+		int bigCodeword = block[0];
+		bool low = true;
+		for (int i=0; i<block.size(); i++){ //what's best way of doing this? loop thorugh whole thing?
+			int diff = (block[i]-block[0]);
+			if (std::abs(diff) > filter){
+				if (diff > 0){
+					smallCodeword = block[0];
+					bigCodeword = block[i];
+				}
+				else{
+					smallCodeword = block[i];
+					bigCodeword = block[0];
+					low = false;
+				}
+				break;
+			}
+		}
+		//need some way of ensuring one value is the lower and the other 
+		int lastBig = bigCodeword;
+		int lastSmall = smallCodeword;
+		Encoded encodedBlock;
+		std::vector<int> encodedVec;
+		std::vector<int> flagVec;
+		 //set this in the initial sweep
+		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
+		for (int i=1; i<block.size()-1; i++){
+			if (std::abs(block[i]-block[i-1]) > filter){
+				low = !low;
+			}
+			if (low){
+				encodedVec.push_back(block[i]-lastSmall);
+				lastSmall = block[i];
+				//lastBig = block[i-1];
+				flagVec.push_back(0);
+			}
+			else{
+				encodedVec.push_back(block[i]-lastBig);
+				//lastSmall = block[i-1];
+				lastBig = block[i];
+				flagVec.push_back(1);
+			}
+
+		}
+		encodedBlock.codewords = std::vector<int>{smallCodeword, bigCodeword};
+		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedVec, flagVec};
+		return encodedBlock;
+
+	
 	}
