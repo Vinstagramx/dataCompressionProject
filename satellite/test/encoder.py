@@ -26,6 +26,7 @@ class Encoder(object):
         self._keep_original = True #flag to keep the original data if length of encoded block is longer
         self.filter_data()
         self._block_regions = self.gen_samples(samples)
+        self._bits = bits
        
     def load_data(self, path):
         data = np.loadtxt(path).T
@@ -255,7 +256,7 @@ class Golomb(Encoder):
         just half at the middle and take max of both halves and multiply both by the length of the
         half-block.
         """
-        orig_len = 14*len(orig_block)
+        orig_len = self._bits*len(orig_block)
         block_length = len(encoded_block); halfway_point = int(block_length/2)
         self._original_bit_length += orig_len
         max_bit_length_remainders = max(self.get_block_bit_lengths(encoded_block[:halfway_point]))
@@ -317,5 +318,45 @@ class DeltaGR(GolombRice):
         golombs = [self.golomb(i, b) for i in compressed]
         data = np.concatenate(([self.binary(i[1]) for i in golombs], [i[0] for i in golombs] ), axis=None)
         return [[ref_point, b], data]
+    
+class StepDelta(Encoder):
+    def encode(self, block):
+        filter_val = 4/7.8125e-3
+        small_codeword = block[0]
+        big_codeword = block[0]
+        low = True
+        encoded_block = []
+        flag_block = []
+        for i in block:
+            diff = i - block[0]
+            if diff > filter_val:
+                if diff > 0:
+                    small_codeword = block[0]
+                    big_codeword = i
+                else:
+                    small_codeword = i
+                    big_codeword = block[0]
+                    low = False
+                break
+        last_small = small_codeword
+        last_big =  big_codeword
+        for i in range(1,len(block)):
+            print((block[i]-block[i-1]))
+            diff = abs(block[i]-block[i-1])
+            if diff > filter_val:
+                print("change of ", diff, " nT")
+                low = not low
+            if low:
+                encoded_block.append(block[i]-last_small)
+                last_small = block[i]
+                flag_block.append(0)
+            else:
+                encoded_block.append(block[i]-last_big)
+                last_big = block[i]
+                flag_block.append(0)
+        return [[small_codeword, big_codeword], encoded_block]
+            
+
+        
 
             
