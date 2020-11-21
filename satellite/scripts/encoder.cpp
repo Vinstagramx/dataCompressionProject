@@ -289,7 +289,7 @@
 		std::vector<int> flagVec;
 		 //set this in the initial sweep
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
-		for (int i=1; i<block.size()-1; i++){
+		for (int i=0; i<block.size(); i++){
 			if (std::abs(block[i]-block[i-1]) > filter){
 				low = !low;
 			}
@@ -305,11 +305,9 @@
 				lastBig = block[i];
 				flagVec.push_back(1);
 			}
-
 		}
 		encodedBlock.codewords = std::vector<int>{smallCodeword, bigCodeword};
 		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedVec, flagVec};
 		return encodedBlock;
 
-	
 	}
