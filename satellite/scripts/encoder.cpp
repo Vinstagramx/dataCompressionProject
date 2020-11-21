@@ -130,7 +130,7 @@
 		return sum;
 	}
 
-	int Encoder::encodeData(){
+	int Encoder::encodeData(bool decodeFlag=false){
 		/*Big method to handle generic encoding process for the data*/
 		int uncompressedBitLength = 0; //total bit length of uncompressed data
 		float compressedBitLength = 0; //total bit length of compressed data, is float so division later returns float
@@ -149,11 +149,26 @@
 			else{
 				compressedBitLength += encodedBlockBitLength;
 			}
+			if (decodeFlag==true){
+				std::vector<int> decodedBlock = decode(encodedBlock);
+				for (int i=0; i<decodedBlock.size(); i++){
+					std::cout<< "dec block: " << decodedBlock[i] << " , orig block: " << block[i] << "\n";
+					if (decodedBlock[i] != block[i]){
+						std::cout << "Error, orignal and decoded block don't match \n";
+					}
+				}
+			}
 		}
 		float compressionRatio = (1- compressedBitLength/uncompressedBitLength)*100;
 		//std::cout << m_direction << " space saving ratio is: " << compressionRatio << "\n";
 		m_compressionRatio = compressionRatio;
 		return 0;
+	}
+
+	std::vector<int> Encoder::decode(Encoded encodedBlock){
+		/*Generic method to overwrite later*/
+		std::vector<int> decoded = encodedBlock.encodedData[0];
+		return decoded;
 	}
 
 
@@ -172,8 +187,19 @@
 		return encodedBlock;
 	}
 
-
-
+	std::vector<int> Delta::decode(Encoded encodedBlock){
+		/*Decode the encoded block by performing reverse delta process - take codeword then add it to first value
+		then add prev value of decoded block to each value of encoded block.*/
+		std::vector<int> encBlock = encodedBlock.encodedData[0];
+		std::vector<int> decodedBlock;
+		int codeword = encodedBlock.codewords[0];
+		int firstValue = codeword;
+		decodedBlock.push_back(firstValue);
+		for (int i=1; i<encBlock.size()-1; i++){
+			decodedBlock.push_back(encBlock[i-1]+decodedBlock[i-1]); //i think enc block doesn't have 0 as first value
+		}
+		return decodedBlock;
+	}
 
 	std::string Golomb::unary(int n){
 		std::string unaryString = "0";

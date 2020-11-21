@@ -43,7 +43,7 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
 			for (int i=3; i < 100; i++){
 				d->setBlockSize(i);
 				d->genSamples(false);
-				d->encodeData();
+				d->encodeData(false);
 				float compRat = d->getCompressionRatio();
 				compressionRatios.push_back(compRat);
 				if (terminateEarly(compressionRatios)){

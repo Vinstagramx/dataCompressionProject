@@ -42,7 +42,8 @@ public:
 	virtual Encoded encode(std::vector<int> &block);
 	std::string binaryString(int n);
 	virtual int calcBitLength(Encoded encBlock);
-	int encodeData();
+	int encodeData(bool decodeFlag);
+	virtual std::vector<int> decode(Encoded encodedBlock);
 };
 
 class Delta : public Encoder
@@ -50,7 +51,7 @@ class Delta : public Encoder
 public:
     using Encoder::Encoder; 
 	Encoded encode(std::vector<int> &block);
-
+	std::vector<int> decode(Encoded encodedBlock);
 };
 
 class Golomb : public Encoder
