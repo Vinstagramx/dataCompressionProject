@@ -252,6 +252,26 @@
 		return encodedBlock;
 	}
 
+	std::vector<int> Golomb::decode(Encoded encodedBlock){
+		int b = encodedBlock.codewords[0];
+		std::vector<int> quotientBlock = encodedBlock.encodedData[0];
+		std::vector<int> remainderBlock = encodedBlock.encodedData[1];
+		std::vector<int> decodedBlock;
+		for (int i=0; i<quotientBlock.size(); i++){
+			int r = remainderBlock[i];
+			int q = quotientBlock[i];
+			int n;
+			if (r>0){
+				n = r+q*b;
+			}
+			else{
+				n = r-q*b;
+			}
+			decodedBlock.push_back(n);
+		}
+		return decodedBlock;
+	}
+
 	int Golomb::calcBitLength(Encoded encBlock){
 		/*Overwritten for golomb because the first block in encoded data needs to be encoded in unary, the rest in binary*/
 		int codewordLength = 0;

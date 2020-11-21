@@ -59,6 +59,7 @@ class Golomb : public Encoder
     using Encoder::Encoder;
 	std::string unary(int n);
 	Encoded encode(std::vector<int> &block);
+	std::vector<int> decode(Encoded encodedBlock);
 	int calcBitLength(Encoded encBlock);
 };
 
