@@ -231,16 +231,17 @@
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
 		for (int i=1; i < block.size(); i++){ // Delta Encoding
 			encodedVec.push_back(block[i]-block[i-1]);
+			std::cout << encodedVec[i-1] << std::endl;
 		}
 		encodedBlock.codewords.push_back(codeword);  // Returning codeword as part of encodedBlock
 		int cumBits;
 		int ind = 0;  // Index of previously full 64-bit block (initialised at 0)
 		std::vector<int> encodedSubBlock;  // Sub-blocks of data - reset every time the payload is filled
 		for (int j=0; j < encodedVec.size(); j++){ //for each integer in delta vector
-
 			std::vector<int> tempVec; // Temporary vector - for the purpose of finding the cumulative bit length
 			std::vector<int> tempLengthsVec; // Bit lengths of temporary vector - used to find the selector.
 			for (int k = ind; k < j; k++){  // From index of previous full payload to current index
+				std::cout << encodedVec[k] << std::endl;
 				tempVec.push_back(encodedVec[k]);
 				tempLengthsVec.push_back(binaryString(encodedVec[k]).length());
 			}
@@ -248,6 +249,7 @@
 			int nextBits;
 			if (j != encodedVec.size() - 1){
 				nextBits = cumBits + binaryString(encodedVec[j+1]).length(); // Cumulative bits at current index + bit length of next datapoint
+				std::cout << "nextbits = " << nextBits << std::endl;
 			}
 
 			if(nextBits > 60){
@@ -256,6 +258,7 @@
 				encodedBlock.codewords.push_back(selector); // Find corresponding selector to max bit length datapoint.
 				encodedSubBlock.clear();  // Clears previous entries of sub-block
 				for (int l = ind; l < j; l++){
+					std::cout << l << std::endl;
 					encodedSubBlock.push_back(encodedVec[l]); // need to add padding
 				}
 				encodedBlock.encodedData.push_back(encodedSubBlock);  // Return encoded
@@ -267,6 +270,7 @@
 				encodedBlock.codewords.push_back(selector); // Find corresponding selector to max bit length datapoint.
 				encodedSubBlock.clear();  // Clears previous entries of sub-block
 				for (int l = ind; l < j; l++){
+					std::cout << l << std::endl;
 					encodedSubBlock.push_back(encodedVec[l]); // need to add padding
 				}
 				encodedBlock.encodedData.push_back(encodedSubBlock);  // Return encoded
