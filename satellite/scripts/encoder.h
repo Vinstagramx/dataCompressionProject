@@ -70,5 +70,15 @@ class StepDelta : public Encoder
 
 };
 
+class Simple8b : public Encoder
+{
+	using Encoder::Encoder;
+	Encoded encode(std::vector<int> &block);
+	int calcCumBitLength(std::vector<int> deltaVec);
+	int calcBitLength(Encoded encBlock);
+	int findSelector(int bitLength);
+	int bitLengthRound(int bitLength);
+};
+
 #endif
 
