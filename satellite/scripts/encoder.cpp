@@ -19,6 +19,9 @@
 		else if (choice=="StepDelta"){
 			return new StepDelta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
 		}
+		else{
+			return new Encoder(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+		}
 	}
 
 	void Encoder::setBlockSize(int bs){ //can adjust blocksize inside object so don't need to load data multiple times
