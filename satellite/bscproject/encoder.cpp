@@ -125,7 +125,6 @@
 		return 0;
 	}
 
-
 	Encoded Delta::encode(std::vector<int> &block){
 		/*Overwrite the encode method with delta specific implementation - subtract each element
 		from the previous element then return the encoded block.*/
@@ -140,9 +139,6 @@
 		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedVec};
 		return encodedBlock;
 	}
-
-
-
 
 	std::string Golomb::unary(int n){
 		std::string unaryString = "0";
@@ -225,21 +221,145 @@
 	}
 
 	Encoded Simple8b::encode(std::vector<int> &block){
+		/* Simple-8b algorithm. Encoded data returned in the form of a vector of codewords (from the prerequisite delta encoding),
+		a vector of selectors, and a vector of encoded integers. Bit lengths of these three separate components would then need to be calculated
+		in the calcBitLength function. Note each 'block' of data from the simple-8b algorithm contains the selector (4 bits) and the payload (encoded data - 60 bits)*/
 		int codeword = block[0];
+		// std::cout << codeword << std::endl;
 		Encoded encodedBlock;
-		std::vector<int> encodedVec;
-		std::vector<int> encodedFlags;
+		std::vector<int> encodedVec;  // Vector which houses result of delta encoding scheme
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
-		for (int i=1; i<block.size()-1; i++){
+		for (int i=1; i < block.size(); i++){ // Delta Encoding
 			encodedVec.push_back(block[i]-block[i-1]);
 		}
-		encodedBlock.codewords = std::vector<int>{codeword};
-		/* need to overwrite the bit lengths function, different sub blocks within a block, whose lengths need to be measured */
-		for (int j=0; j < encodedVec.size(); j++){ //for each integer in block
-			int binLength = binaryString(encBlock.encodedData[i][j]).length();
+		encodedBlock.codewords.push_back(codeword);  // Returning codeword as part of encodedBlock
+		int cumBits;
+		int ind = 0;  // Index of previously full 64-bit block (initialised at 0)
+		std::vector<int> encodedSubBlock;  // Sub-blocks of data - reset every time the payload is filled
+		for (int j=0; j < encodedVec.size(); j++){ //for each integer in delta vector
+
+			std::vector<int> tempVec; // Temporary vector - for the purpose of finding the cumulative bit length
+			std::vector<int> tempLengthsVec; // Bit lengths of temporary vector - used to find the selector.
+			for (int k = ind; k < j; k++){  // From index of previous full payload to current index
+				tempVec.push_back(encodedVec[k]);
+				tempLengthsVec.push_back(binaryString(encodedVec[k]).length());
+			}
+			cumBits = calcCumBitLength(tempVec);
+			int nextBits;
+			if (j != encodedVec.size() - 1){
+				nextBits = cumBits + binaryString(encodedVec[j+1]).length(); // Cumulative bits at current index + bit length of next datapoint
+			}
+
+			if(nextBits > 60){
+				int maxVal = *std::max_element(tempLengthsVec.begin(), tempLengthsVec.end()); //use * as std::max_element returns iterator
+				int selector = findSelector(maxVal);
+				encodedBlock.codewords.push_back(selector); // Find corresponding selector to max bit length datapoint.
+				encodedSubBlock.clear();  // Clears previous entries of sub-block
+				for (int l = ind; l < j; l++){
+					encodedSubBlock.push_back(encodedVec[l]); // need to add padding
+				}
+				encodedBlock.encodedData.push_back(encodedSubBlock);  // Return encoded
+				ind = j+1; // Start a new 64-bit block, and the payload searching process, from the next index.
+			}		
+			if(j == encodedVec.size() - 1){ // If end of block is reached without payload is full (less than 60 bits), need to pad with zeros and push back.
+				int maxVal = *std::max_element(tempLengthsVec.begin(), tempLengthsVec.end()); //use * as std::max_element returns iterator
+				int selector = findSelector(maxVal);
+				encodedBlock.codewords.push_back(selector); // Find corresponding selector to max bit length datapoint.
+				encodedSubBlock.clear();  // Clears previous entries of sub-block
+				for (int l = ind; l < j; l++){
+					encodedSubBlock.push_back(encodedVec[l]); // need to add padding
+				}
+				encodedBlock.encodedData.push_back(encodedSubBlock);  // Return encoded
+			}
+		}
+		return encodedBlock;
+	}
+
+	int Simple8b::findSelector(int bitLength){
+		/* Finds the selector of the simple-8b algorithm based on the number of bits needed to represent a given number */
+		int selector;
+		if(bitLength <= 8){
+			selector = bitLength + 1;
+		}
+		else if(bitLength > 8 && bitLength <= 10){
+			selector = 10;
+		}
+		else if(bitLength > 10 && bitLength <= 12){
+			selector = 11;
+		}
+		else if(bitLength > 12 && bitLength <= 15){
+			selector = 12;
+		}		
+		else if(bitLength > 15 && bitLength <= 20){
+			selector = 13;
+		}
+		else if(bitLength > 20 && bitLength <= 30){
+			selector = 14;
+		}		
+		else if(bitLength > 30 && bitLength <= 60){
+			selector = 15;
+		}		
+		return selector;
+	}
+
+	int Simple8b::bitLengthRound(int bitLength){
+		/* Rounds the bit length to the next width as determined by the selector */
+		int round;
+		if(bitLength > 8 && bitLength <= 10){
+			round = 10;
+		}
+		else if(bitLength > 10 && bitLength <= 12){
+			round = 12;
+		}
+		else if(bitLength > 12 && bitLength <= 15){
+			round = 15;
+		}		
+		else if(bitLength > 15 && bitLength <= 20){
+			round = 20;
+		}
+		else if(bitLength > 20 && bitLength <= 30){
+			round = 30;
+		}		
+		else if(bitLength > 30 && bitLength <= 60){
+			round = 60;
+		}
+		else{
+			round = bitLength;
+		}
+		return round;
+	}
+
+	int Simple8b::calcCumBitLength(std::vector<int> deltaVec){
+		/*Overwritten for Simple-8b: we need the cumulative bit length as we add more points to the payload*/
+		int blockLength = 0;
+		std::vector<int> bitLengths;
+		for (int i=0; i < deltaVec.size(); i++){ //for each block in encoded data
+			int binLength = binaryString(deltaVec[i]).length();
 			bitLengths.push_back(binLength);
 		}
-		
-		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedVec};
-		return encodedBlock;
+		int maxVal = *std::max_element(bitLengths.begin(), bitLengths.end()); //use * as std::max_element returns iterator
+		maxVal = bitLengthRound(maxVal); // Rounding the bit length to the next available width as determined by the selector
+		blockLength += maxVal*m_blockSize; //block bit length should be the length of longest bit * size of block (implict truncation)
+		return blockLength;
+	}
+
+	int Simple8b::calcBitLength(Encoded encBlock){
+		/*Overwritten for Simple-8b, as we need to find the bit lengths of the codewords, selectors, and the data in the block */
+		int codewordLength = 0;
+		codewordLength += binaryString(encBlock.codewords[0]).length(); //get length of binary string of codeword
+		for (int i=1; i < encBlock.codewords.size(); i++){ //for each codeword in codewords
+			codewordLength += 4;
+		}
+
+		int blockLength = 0;
+		for (int i=0; i < encBlock.encodedData.size(); i++){ //for each other block in encoded data
+			std::vector<int> bitLengths; //maybe optimise later by setting this to size of encodedData.size() and using indexing rather than push_back
+			for (int j=0; j < encBlock.encodedData[i].size(); j++){ //for each sub-block in block
+				int binLength = binaryString(encBlock.encodedData[i][j]).length();  // For each val in sub-block
+				bitLengths.push_back(binLength);
+			}
+			blockLength += 60;
+		}
+		int sum = codewordLength + blockLength;
+		return sum;
 	}
