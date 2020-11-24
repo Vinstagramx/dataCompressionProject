@@ -86,7 +86,7 @@ def save(data, out):
 
 
 #%%
-def main(n, dc=False):
+def manage_files(n, dc=False):
     file_list = open("file_list.txt", "r").readlines()
     edited_file_list = [i[4:29].strip("/") for i in file_list]
     print(edited_file_list)
@@ -104,8 +104,9 @@ def main(n, dc=False):
         mod = simulate_interference(wave_data, data, dc_offset)
         save(mod, OUTFILE)
         
-for i in range(1,6):
-    main(i)
+if __name__ == "__main__":
+    for i in range(0,7):
+        manage_files(i, True)
     
 
 
