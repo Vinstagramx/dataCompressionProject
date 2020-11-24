@@ -9,11 +9,14 @@ import sys
 import matplotlib.pyplot as plt
 
 def pretty_graph(x_label, y_label, title, fontsize): #formatting graphs
+    figure = plt.gcf()  # Sets figure size
+    figure.set_size_inches(18, 10)
     plt.xlabel(x_label,fontsize=fontsize)
     plt.title(title,fontsize=fontsize)
     plt.ylabel(y_label,fontsize=fontsize) 
     plt.tick_params(labelsize=fontsize)
     plt.legend()
+    plt.grid()
 
 #data seems to go 2,4,0,6,1,3,5=7,5
 
