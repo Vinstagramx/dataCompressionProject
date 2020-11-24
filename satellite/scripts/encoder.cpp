@@ -22,6 +22,9 @@
 		else if (choice == "Simple8b"){
 			return new Simple8b(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
 		}
+		else if (choice == "DeltaDelta"){
+			return new DeltaDelta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+		}
 		else{
 			return new Encoder(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
 		}
@@ -375,7 +378,7 @@
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
 		for (int i=1; i < block.size(); i++){ // Delta Encoding
 			encodedVec.push_back(block[i]-block[i-1]);
-			std::cout << encodedVec[i-1] << std::endl;
+			// std::cout << encodedVec[i-1] << std::endl;
 		}
 		encodedBlock.codewords.push_back(codeword);  // Returning codeword as part of encodedBlock
 		int cumBits;
@@ -384,16 +387,22 @@
 		for (int j=0; j < encodedVec.size(); j++){ //for each integer in delta vector
 			std::vector<int> tempVec; // Temporary vector - for the purpose of finding the cumulative bit length
 			std::vector<int> tempLengthsVec; // Bit lengths of temporary vector - used to find the selector.
-			for (int k = ind; k < j; k++){  // From index of previous full payload to current index
-				std::cout << encodedVec[k] << std::endl;
-				tempVec.push_back(encodedVec[k]);
-				tempLengthsVec.push_back(binaryString(encodedVec[k]).length());
+			if (j == ind){
+				continue;
 			}
+			else{
+				for (int k = ind; k < j; k++){  // From index of previous full payload to current index
+					// std::cout << encodedVec[k] << std::endl;
+					tempVec.push_back(encodedVec[k]);
+					tempLengthsVec.push_back(binaryString(encodedVec[k]).length());
+				}
+			}
+			
 			cumBits = calcCumBitLength(tempVec);
 			int nextBits;
 			if (j != encodedVec.size() - 1){
 				nextBits = cumBits + binaryString(encodedVec[j+1]).length(); // Cumulative bits at current index + bit length of next datapoint
-				std::cout << "nextbits = " << nextBits << std::endl;
+				// std::cout << "nextbits = " << nextBits << std::endl;
 			}
 
 			if(nextBits > 60){
@@ -402,7 +411,7 @@
 				encodedBlock.codewords.push_back(selector); // Find corresponding selector to max bit length datapoint.
 				encodedSubBlock.clear();  // Clears previous entries of sub-block
 				for (int l = ind; l < j; l++){
-					std::cout << l << std::endl;
+					// std::cout << l << std::endl;
 					encodedSubBlock.push_back(encodedVec[l]); // need to add padding
 				}
 				encodedBlock.encodedData.push_back(encodedSubBlock);  // Return encoded
@@ -414,7 +423,7 @@
 				encodedBlock.codewords.push_back(selector); // Find corresponding selector to max bit length datapoint.
 				encodedSubBlock.clear();  // Clears previous entries of sub-block
 				for (int l = ind; l < j; l++){
-					std::cout << l << std::endl;
+					// std::cout << "End of block, index = " << l << std::endl;
 					encodedSubBlock.push_back(encodedVec[l]); // need to add padding
 				}
 				encodedBlock.encodedData.push_back(encodedSubBlock);  // Return encoded
@@ -495,7 +504,7 @@
 		/*Overwritten for Simple-8b, as we need to find the bit lengths of the codewords, selectors, and the data in the block */
 		int codewordLength = 0;
 		codewordLength += binaryString(encBlock.codewords[0]).length(); //get length of binary string of codeword
-		for (int i=1; i < encBlock.codewords.size(); i++){ //for each codeword in codewords
+		for (int i=1; i < encBlock.codewords.size(); i++){ //for each selector in codewords
 			codewordLength += 4;
 		}
 
@@ -510,4 +519,43 @@
 		}
 		int sum = codewordLength + blockLength;
 		return sum;
+	}
+
+	Encoded DeltaDelta::encode(std::vector<int> &block){
+		/*Overwrite the encode method with delta-of-delta specific implementation - subtract each element
+		from the previous element then return the encoded block. Repeat this procedure again.*/
+		int codeword = block[0];
+		Encoded encodedBlock;
+		std::vector<int> encodedVec;
+		std::vector<int> codewords;
+		std::vector<int> encodedDeltaVec;
+		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
+		for (int i=1; i<block.size()-1; i++){
+			encodedVec.push_back(block[i]-block[i-1]);
+		}
+		codewords.push_back(codeword);
+		codewords.push_back(encodedVec[0]);
+		for (int j=1; j < encodedVec.size()-1; j++){
+			encodedDeltaVec.push_back(encodedVec[j]-encodedVec[j-1]);
+		}
+		encodedBlock.codewords = codewords;
+		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedDeltaVec};
+		return encodedBlock;
+	}
+
+	std::vector<int> DeltaDelta::decode(Encoded encodedBlock){
+		/*Decode the encoded block by performing reverse delta process - take codeword then add it to first value
+		then add prev value of decoded block to each value of encoded block.*/
+		std::vector<int> encBlock = encodedBlock.encodedData[0];
+		std::vector<int> decodedBlock;
+		int codeword = encodedBlock.codewords[0];
+		int deltaCodeword = encodedBlock.codewords[1];
+		int firstValue = codeword;
+		int secondValue = deltaCodeword;
+		decodedBlock.push_back(firstValue);
+		decodedBlock.push_back(secondValue);
+		for (int i=2; i < encBlock.size()-1; i++){
+			decodedBlock.push_back(encBlock[i-1]+decodedBlock[i-1]); //i think enc block doesn't have 0 as first value
+		}
+		return decodedBlock;
 	}

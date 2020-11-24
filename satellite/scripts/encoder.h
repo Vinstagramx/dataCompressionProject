@@ -80,5 +80,13 @@ class Simple8b : public Encoder
 	int bitLengthRound(int bitLength);
 };
 
+class DeltaDelta : public Encoder
+{
+public:
+    using Encoder::Encoder; 
+	Encoded encode(std::vector<int> &block);
+	std::vector<int> decode(Encoded encodedBlock);
+};
+
 #endif
 

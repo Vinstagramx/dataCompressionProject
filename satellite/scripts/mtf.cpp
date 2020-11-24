@@ -33,14 +33,14 @@ std::vector<float> split_mtf(std::vector<std::string> fileList){
     std::vector<float> maxCompressionRatios;
 	std::string dirs[3] = {"x", "y", "z"};
 	for (int file=0; file < fileList.size(); file++){
-		Encoder temp = Encoder(3, fileList[file], SAMPLE_SIZE, "x", MODE, BITS);
+		Encoder temp = Encoder(5, fileList[file], SAMPLE_SIZE, "x", MODE, BITS);
 		Encoder* d = temp.makeEncoder(ENC_TYPE);
 		d->loadData();
 		for(int j=0; j<3; j++){
 			std::vector<float> compressionRatios;
 			d->setDirection(dirs[j]);
 			std::cout<< "file: " << fileList[file] << " in direction: " << dirs[j] << "\n";
-			for (int i=3; i < 100; i++){
+			for (int i=5; i < 100; i++){
 				d->setBlockSize(i);
 				d->genSamples(false);
 				d->encodeData(false);
