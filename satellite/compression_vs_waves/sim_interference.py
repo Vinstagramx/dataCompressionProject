@@ -100,7 +100,7 @@ def manage_files(file, n, dc=False, dc_only = False):
 if __name__ == "__main__":
     file_names = []
     for i in range(0,8):
-        if i = 0:
+        if i == 0:
             manage_files(sys.argv[1], i, True, True)
         else:
             manage_files(sys.argv[1], i, True, False)
