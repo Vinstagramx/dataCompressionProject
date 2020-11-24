@@ -54,21 +54,25 @@ def gen_wave_data(n, max_amp, max_freq):
         wave_data.append(temp_wave)
     return wave_data
 
-def simulate_interference(wave_data, data, dc_offset = [0,0,0]):
+def simulate_interference(wave_data, data, dc_offset = [0,0,0], dc_only = False):
     """Given an input list of thruples wave_data and the data to be modified,
     create n squares using wave_data to get their period, offset and amplitude.
     Then add these square waves to the data and save. If a dc offset is supplied,
-    add this to the data as well."""
+    add this to the data as well.
+    If dc_only == True, only DC interference is used.
+    """
+
     modified_data = []
     for direction in range(3):
         dir_data = data[direction]
         temp_data = dir_data
         temp_data = temp_data + dc_offset[direction]
         time = np.array([i for i in range(len(dir_data))])*time_interval
-        for wave in wave_data:
-            sq_wave = np.array([square_wave(i, wave[0], wave[1], wave[2]) \
-                                for i in time])
-            temp_data = temp_data + sq_wave
+        if dc_only == False:
+            for wave in wave_data:
+                sq_wave = np.array([square_wave(i, wave[0], wave[1], wave[2]) \
+                                    for i in time])
+                temp_data = temp_data + sq_wave
         modified_data.append(temp_data)
     return (time, modified_data)
 
@@ -80,7 +84,8 @@ def save(data, out):
         f.write(string)
     f.close()
 
-def manage_files(file, n, dc=False):
+def manage_files(file, n, dc=False, dc_only = False):
+    # If dc_only == True - i.e. for 0 waves added, then no square waves are added onto the data.
     wave_data = gen_wave_data(n, 5, 1.5)
     print(wave_data)
     if dc:
@@ -88,14 +93,17 @@ def manage_files(file, n, dc=False):
     else:
         dc_offset= [0,0,0]
     data = load_data(file)
-    mod = simulate_interference(wave_data, data, dc_offset)
+    mod = simulate_interference(wave_data, data, dc_offset, dc_only)
     outfile = file[:9] + "_modified_"+str(n)+".txt"
     save(mod, outfile)
         
 if __name__ == "__main__":
     file_names = []
     for i in range(0,8):
-        manage_files(sys.argv[1], i, True)
+        if i = 0:
+            manage_files(sys.argv[1], i, True, True)
+        else:
+            manage_files(sys.argv[1], i, True, False)
         file_names.append(sys.argv[1][:9]+ "_modified_"+str(i)+".txt")
     f = open("temp_file_list.txt", "w")
     for i in range(len(file_names)):
