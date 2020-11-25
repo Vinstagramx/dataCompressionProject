@@ -66,7 +66,7 @@ def gen_wave_data(n, max_amp, max_freq):
     """Generate n-1 waves of random amplitude and frequency. At the start 
     generate 1 major wave that has a higher maximum possible amplitude distribution
     than the other waves."""
-    wave_data = [(0,0,0)]
+    wave_data = [(1,0,0)]
     major_wave = (random.uniform(0.8,1.2), 0, random.uniform(3.5,5))
     wave_data.append(major_wave)
     for i in range(n-1):
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     wave_data = gen_wave_data(8, 5, 1.5) #so we use the same interference for each wave, just adding a new one each time
     data = load_data(sys.argv[1])
     dc = dc_interference() #generate consistent dc interference
-    for i in range(0,8):
+    for i in range(0,9):
         out_data = simulate_interference(wave_data[:i+1], data, dc) #only use i waves in the interference
         outfile = sys.argv[1][:9] + "_modified_"+str(i)+".txt"
         save(out_data, outfile)

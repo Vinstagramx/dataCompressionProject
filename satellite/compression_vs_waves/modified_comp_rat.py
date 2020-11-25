@@ -26,7 +26,7 @@ def main(file):
         lines = [float(line.rstrip()) for line in f] #strip newline, convert to float
     labels = "xyz"
     markers = ["^", ".", "s"]
-    x = []; y = []; z = [];
+    x = []; y = []; z = []
     data = [x,y,z]
     for i in range(0, len(lines)):
         data[i%3].append(lines[i])
@@ -35,9 +35,9 @@ def main(file):
         plt.plot(wave_no, data[i], label=labels[i], marker=markers[i], \
                  ms=20,ls="-",  lw=4)
     pretty_graph("Number of waves", "Compression ratio (%)", \
-                 "Compression ratio of Delta encoding as a function of interference", 24)
+                 "Compression ratio of Simple-8b encoding as a function of interference", 24)
     plt.legend(fontsize=20)
     plt.gca().set_facecolor("#fffcf5")
-    plt.savefig("compression_vs_waves")
+    plt.savefig("compression_vs_waves_C3_1603011_Simple8.pdf")
 
 main("temp_compression_data.txt")
