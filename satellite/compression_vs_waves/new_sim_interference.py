@@ -74,6 +74,19 @@ def gen_wave_data(n, max_amp, max_freq):
         wave_data.append(temp_wave)
     return wave_data
 
+def add_sine_wave(array, max_amp = 10, max_freq = 30):
+    """Generate a sinusoidal wave of a random amplitude and frequency, using an input array
+    of data (for start and end values, and also number of samples of sine wave to take)
+    --> Freq: up to 30Hz
+    --> Amplitude: up to 10nT
+    """
+    sample_num = len(array)
+    samples = np.linspace(array[0], array[1], num = sample_num)
+    amp = max_amp * np.random.random(size=None)
+    freq = max_freq * np.random.random(size = None)
+    sine_wave = amp * np.sin(2 * np.pi * freq * samples)
+    return np.array(array) + sine_wave
+
 def save(data, out):
     time = data[0]
     f = open(out, "w")
