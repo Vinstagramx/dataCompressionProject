@@ -66,13 +66,26 @@ def gen_wave_data(n, max_amp, max_freq):
     """Generate n-1 waves of random amplitude and frequency. At the start 
     generate 1 major wave that has a higher maximum possible amplitude distribution
     than the other waves."""
-    wave_data = [(0,0,0)]
+    wave_data = [(1,0,0)]
     major_wave = (random.uniform(0.8,1.2), 0, random.uniform(3.5,5))
     wave_data.append(major_wave)
     for i in range(n-1):
         temp_wave = (random.uniform(0.8,1.2), 0, random.uniform(0.25,3.5))
         wave_data.append(temp_wave)
     return wave_data
+
+def add_sine_wave(array, max_amp = 10, max_freq = 30):
+    """Generate a sinusoidal wave of a random amplitude and frequency, using an input array
+    of data (for start and end values, and also number of samples of sine wave to take)
+    --> Freq: up to 30Hz
+    --> Amplitude: up to 10nT
+    """
+    sample_num = len(array)
+    samples = np.linspace(array[0], array[1], num = sample_num)
+    amp = max_amp * np.random.random(size=None)
+    freq = max_freq * np.random.random(size = None)
+    sine_wave = amp * np.sin(2 * np.pi * freq * samples)
+    return np.array(array) + sine_wave
 
 def save(data, out):
     time = data[0]
@@ -87,7 +100,7 @@ if __name__ == "__main__":
     wave_data = gen_wave_data(8, 5, 1.5) #so we use the same interference for each wave, just adding a new one each time
     data = load_data(sys.argv[1])
     dc = dc_interference() #generate consistent dc interference
-    for i in range(0,8):
+    for i in range(0,9):
         out_data = simulate_interference(wave_data[:i+1], data, dc) #only use i waves in the interference
         outfile = sys.argv[1][:9] + "_modified_"+str(i)+".txt"
         save(out_data, outfile)
