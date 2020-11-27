@@ -24,7 +24,8 @@ def load_data(path):
         fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.float) #does this round down or nearest - if we can't reconstruct data look at this 
         return fixed_array
 
-def square_wave(t, T, offset=0, amplitude = 1):
+def square_wave(f, T, offset=0, amplitude = 1):
+    t = 1/f 
     period = t//T #function repeats so this is the number of cycles
     if t < 0:
         v_in = 1
