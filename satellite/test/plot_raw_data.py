@@ -6,7 +6,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 cwd = os.getcwd()
 parent_dir = os.path.dirname(cwd)
 cwd = os.path.dirname(cwd)
-filename = 'C1_160313'
+filename = 'C2_160318'
 path = os.path.join(cwd, 'data', f'{filename}.FS.UNCAL.FULLRES')
 #c1_160309
 
