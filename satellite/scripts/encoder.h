@@ -67,6 +67,7 @@ class StepDelta : public Encoder
 {
     using Encoder::Encoder;
 	Encoded encode(std::vector<int> &block);
+	int calcBitLength(Encoded encBlock);
 
 };
 

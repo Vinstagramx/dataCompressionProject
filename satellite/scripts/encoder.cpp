@@ -317,24 +317,21 @@
 		stream and subtracting the previous value in that high or low stream. Note that this might reduce performance by 
 		more than expected as i've effectively increased the time between samples by splitting (so more oppurtunity for 
 		variance into two streams*/
-		float filter = 3/7.8125e-3; //a jump of 3nT in scaled units
+		//float filter = 3/7.8125e-3; //a jump of 3nT in scaled units
+		float filter = *std::max_element(block.begin(), block.end())/2;//std::accumulate(block.begin(), block.end(), 0.0)/block.size(); //find the average using acucmulate
 		int smallCodeword = block[0];
 		int bigCodeword = block[0];
-		bool low = true;
-		for (int i=0; i<block.size(); i++){ //what's best way of doing this? loop thorugh whole thing?
-			int diff = (block[i]-block[0]);
-			if (std::abs(diff) > filter){
-				if (diff > 0){
-					smallCodeword = block[0];
-					bigCodeword = block[i];
-				}
-				else{
-					smallCodeword = block[i];
-					bigCodeword = block[0];
-					low = false;
-				}
-				break;
+		for (int i=0; i <block.size(); i++){
+			if (block[i] < filter){
+				smallCodeword = block[i];
 			}
+			break;
+		}
+		for (int i=0; i <block.size(); i++){
+			if (block[i] > filter){
+				bigCodeword = block[i];
+			}
+			break;
 		}
 		//need some way of ensuring one value is the lower and the other 
 		int lastBig = bigCodeword;
@@ -345,10 +342,7 @@
 		 //set this in the initial sweep
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
 		for (int i=0; i<block.size(); i++){
-			if (std::abs(block[i]-block[i-1]) > filter){
-				low = !low;
-			}
-			if (low){
+			if (block[i]<filter){
 				encodedVec.push_back(block[i]-lastSmall);
 				lastSmall = block[i];
 				//lastBig = block[i-1];
@@ -362,9 +356,37 @@
 			}
 		}
 		encodedBlock.codewords = std::vector<int>{smallCodeword, bigCodeword};
-		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedVec, flagVec};
+		encodedBlock.encodedData = std::vector<std::vector<int>>{flagVec, encodedVec};
 		return encodedBlock;
 
+	}
+
+	int StepDelta::calcBitLength(Encoded encBlock){
+		int codewordLength = 0;
+		for (int i=0; i < encBlock.codewords.size(); i++){ //for each codeword in codewords
+			int binLength = binaryString(encBlock.codewords[i]).length(); //get length of binary string of codeword
+			codewordLength += binLength;
+		}
+		int blockLength = 0;
+		std::vector<int> unaryBitLengths;
+		for (int i=0; i < encBlock.encodedData[0].size(); i++){ //assuming the first block is the quotient block to be encoded in unary
+			int unaryLength = 1;
+			unaryBitLengths.push_back(unaryLength);
+		}
+		//int maxUnaryVal =  *std::max_element(unaryBitLengths.begin(), unaryBitLengths.end());
+		blockLength += m_blockSize;
+
+		for (int i=1; i < encBlock.encodedData.size(); i++){ //for each other block in encoded data
+			std::vector<int> bitLengths; //maybe optimise later by setting this to size of encodedData.size() and using indexing rather than push_back
+			for (int j=0; j < encBlock.encodedData[i].size(); j++){ //for each integer in block
+				int binLength = binaryString(encBlock.encodedData[i][j]).length();
+				bitLengths.push_back(binLength);
+			}
+			int maxVal = *std::max_element(bitLengths.begin(), bitLengths.end()); //use * as std::max_element returns iterator
+			blockLength += maxVal*m_blockSize; //block bit length should be the length of longest bit * size of block (implict truncation)
+		}
+		int sum = codewordLength + blockLength;
+		return sum;
 	}
 
 	Encoded Simple8b::encode(std::vector<int> &block){

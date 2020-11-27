@@ -1,4 +1,4 @@
-data/C1_160308.txt
-data/C1_160311.txt
-data/C1_160313.txt
-data/C2_160308.txt
+data/C1_160308.FS.FULLRES.txt
+data/C1_160311.FS.FULLRES.txt
+data/C1_160313.FS.FULLRES.txt
+data/C2_160308.FS.FULLRES.txt
