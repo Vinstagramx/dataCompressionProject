@@ -55,6 +55,23 @@ int csv_save(std::string filePath, std::vector<float> vecIn){
 	return 0;
 }
 
+
+int tolerances_save(std::string filePath, std::vector<std::vector<int>> vecIn){
+	std::ofstream outf{filePath, std::ios::out};
+	if (!outf){
+		std::cerr << "Error opening file " << filePath << " !\n"; 
+	}
+	for (int i=0; i<vecIn.size(); i++){
+		for (int j=0; j<vecIn[i].size(); j++){
+			outf << vecIn[i][j] << " ";
+		}
+		outf << "\n";
+	}
+	return 0;
+}
+
+
+
 std::vector<std::string> generateFileList(std::string dirListFile){
 	/*Given textfile with name of each file to be read on each line,
 	get all these file names and return a vector of strings.*/
