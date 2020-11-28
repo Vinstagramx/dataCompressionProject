@@ -6,15 +6,16 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 cwd = os.getcwd()
 parent_dir = os.path.dirname(cwd)
 cwd = os.path.dirname(cwd)
-filename = 'C2_160318'
+filename = 'C4_160313'
 path = os.path.join(cwd, 'data', f'{filename}.FS.UNCAL.FULLRES')
 #c1_160309
 
 data = np.loadtxt(path).T
-
-time = np.arange(0, len(data[0]), 1) * 0.14866719
+#timestep:  * 0.14866719
+time = np.arange(0, len(data[0]), 1)
 fixed_x = data[1]; fixed_y = data[2]; fixed_z = data[3]
 b_data = np.array([fixed_x, fixed_y, fixed_z], dtype = np.int32) 
+magn = np.sqrt(np.square(fixed_x) + np.square(fixed_y) + np.square(fixed_z))
 
 def plot_settings():
     plt.clf()  # Clears any previous figures
@@ -33,6 +34,7 @@ plt.ylabel("Magnetic Field (nT)")
 plt.plot(time, b_data[0], label = 'x')
 #plt.plot(time, b_data[1], label = 'y')
 #plt.plot(time, b_data[2], label = 'z')
+#plt.plot(time, magn, label = '|B|')
 plt.legend()
 
 
