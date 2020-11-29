@@ -379,7 +379,7 @@
 			unaryBitLengths.push_back(unaryLength);
 		}
 		//int maxUnaryVal =  *std::max_element(unaryBitLengths.begin(), unaryBitLengths.end());
-		blockLength += m_blockSize;
+		blockLength += encBlock.encodedData[0].size();
 
 		for (int i=1; i < encBlock.encodedData.size(); i++){ //for each other block in encoded data
 			std::vector<int> bitLengths; //maybe optimise later by setting this to size of encodedData.size() and using indexing rather than push_back
@@ -587,4 +587,53 @@
 			decodedBlock.push_back(encBlock[i-1]+decodedBlock[i-1]); //i think enc block doesn't have 0 as first value
 		}
 		return decodedBlock;
+	}
+	
+    Encoded DeltaGolomb::encode(std::vector<int> &block){
+		/*Overwrite the encode method with Golomb specific implementation - divide each number
+		in block by fixed paramter b which is determined by the mode. Store the quotient q in
+		unary in one block of instance of Encoded and the remainders in another.*/
+		Encoded encodedBlock;
+		int b = 0;
+		std::vector<int> absBlock;
+		for (int i=0; i< block.size(); i++){
+			absBlock.push_back(std::abs(block[i])); //need block of only +ve values to find max and min of 
+		}
+
+		if (m_mode == "mean"){
+			float average = std::accumulate(block.begin(), block.end(), 0.0)/block.size(); //find the average using acucmulate
+			b = std::round(average); //need b to be int for golomb to work
+		} else if (m_mode == "min"){
+			b = *std::min_element(absBlock.begin(), absBlock.end());
+		} else if (m_mode == "max"){
+			b = *std::max_element(absBlock.begin(), absBlock.end());
+		}
+
+		std::vector<int> deltaBlock;
+		int deltaCodeword = block[0];
+		//deltaBlock.push_back(deltaCodeword)
+		for (int n=1; n<block.size()-1; n++){
+			deltaBlock.push_back(block[n]-block[n-1]);
+		}
+		
+		std::vector<int> remainderBlock;
+		std::vector<int> quotientBlock;
+		for (int n=0; n< deltaBlock.size(); n++){
+			int absN = std::abs(deltaBlock[n]); //need absolute value for consistency between -ve and +ve
+			int q = (b == 0) ? 0 : absN/b; //check here, but should be integer division that rounds down/discards decimal part 
+			int r = 0;
+			if (deltaBlock[n] < 0){
+				r = deltaBlock[n] + q*b;
+			}
+			else{
+				r = deltaBlock[n] - q*b;
+			}
+			remainderBlock.push_back(r);
+			quotientBlock.push_back(q);
+		}
+		encodedBlock.codewords.push_back(deltaCodeword);
+		encodedBlock.codewords.push_back(b);
+		encodedBlock.encodedData.push_back(quotientBlock);
+		encodedBlock.encodedData.push_back(remainderBlock);
+		return encodedBlock;
 	}

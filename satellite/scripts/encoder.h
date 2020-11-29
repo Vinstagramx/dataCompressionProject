@@ -90,5 +90,11 @@ public:
 	std::vector<int> decode(Encoded encodedBlock);
 };
 
+class DeltaGolomb : public Golomb
+{
+public:
+	using Golomb::Golomb;
+	Encoded encode(std::vector<int> &block);
+};
 #endif
 
