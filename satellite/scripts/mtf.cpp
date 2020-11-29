@@ -85,14 +85,14 @@ int main(int argc, char* argv[]){
 	/*So not sure the best way to get two things out of async so what I did was just return an 3xN array of all the compression ratios
 	we got from t1, t2, etc. This means we need to do some ugly array parsing to get the max data out but it also means we can get
 	the tolerance in the same way.*/
-	std::future<std::vector<std::vector<std::vector<float>>>> t1 = std::async(&split_mtf, splitFilePaths[0]);
-	std::future<std::vector<std::vector<std::vector<float>>>> t2 = std::async(&split_mtf, splitFilePaths[1]);
-	std::future<std::vector<std::vector<std::vector<float>>>> t3 = std::async(&split_mtf, splitFilePaths[2]);
-	std::future<std::vector<std::vector<std::vector<float>>>> t4 = std::async(&split_mtf, splitFilePaths[3]);
-	std::vector<std::vector<std::vector<float>>> compRat1 = t1.get();
-	std::vector<std::vector<std::vector<float>>> compRat2 = t2.get();
-	std::vector<std::vector<std::vector<float>>> compRat3 = t3.get();
-	std::vector<std::vector<std::vector<float>>> compRat4 = t4.get();
+	auto t1 = std::async(&split_mtf, splitFilePaths[0]);
+	auto t2 = std::async(&split_mtf, splitFilePaths[1]);
+	auto t3 = std::async(&split_mtf, splitFilePaths[2]);
+	auto t4 = std::async(&split_mtf, splitFilePaths[3]);
+	auto compRat1 = t1.get();
+	auto compRat2 = t2.get();
+	auto compRat3 = t3.get();
+	auto compRat4 = t4.get();
 	std::vector<std::vector<std::vector<std::vector<float>>>> combined{compRat1, compRat2, compRat3, compRat4};
 	std::vector<float> maxCompressionRatios;
 	std::vector<std::vector<int>> tolerances;
@@ -117,10 +117,10 @@ int main(int argc, char* argv[]){
 						tolerances.push_back(tempMaxMin);
 					}
 				}
-	            		maxCompressionRatios.push_back(max);
+				maxCompressionRatios.push_back(max);
 			}
-        	}
-    	}
+		}
+	}
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::minutes>(stop-start);
 	std::cout << "finished successfully in " << duration.count() << " minutes \n";

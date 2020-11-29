@@ -72,6 +72,11 @@
 	float Encoder::getCompressionRatio(){
 		return m_compressionRatio;
 	}
+	
+	int Encoder::getDataLength(){
+		return m_data.size();
+	}
+
 	void Encoder::genSamples(bool random){
 		/*Create list of indices spaced by blocksize from which m_sampleIndices are selected and returned using PRNG*/
 		int maxSampleIndex = m_data.size()/m_blockSize;
@@ -133,7 +138,7 @@
 				bitLengths.push_back(binLength);
 			}
 			int maxVal = *std::max_element(bitLengths.begin(), bitLengths.end()); //use * as std::max_element returns iterator
-			blockLength += maxVal*m_blockSize; //block bit length should be the length of longest bit * size of block (implict truncation)
+			blockLength += maxVal * encBlock.encodedData[i].size(); //block bit length should be the length of longest bit * size of block (implict truncation)
 		}
 		int sum = codewordLength + blockLength;
 		return sum;
@@ -394,7 +399,7 @@
 		a vector of selectors, and a vector of encoded integers. Bit lengths of these three separate components would then need to be calculated
 		in the calcBitLength function. Note each 'block' of data from the simple-8b algorithm contains the selector (4 bits) and the payload (encoded data - 60 bits)*/
 		int codeword = block[0];
-		// std::cout << codeword << std::endl;
+		// std::cout << "codeword" << codeword << std::endl;
 		Encoded encodedBlock;
 		std::vector<int> encodedVec;  // Vector which houses result of delta encoding scheme
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
@@ -518,7 +523,7 @@
 		}
 		int maxVal = *std::max_element(bitLengths.begin(), bitLengths.end()); //use * as std::max_element returns iterator
 		maxVal = bitLengthRound(maxVal); // Rounding the bit length to the next available width as determined by the selector
-		blockLength += maxVal*m_blockSize; //block bit length should be the length of longest bit * size of block (implict truncation)
+		blockLength += maxVal*deltaVec.size(); //block bit length should be the length of longest bit * size of block (implict truncation)
 		return blockLength;
 	}
 
@@ -532,13 +537,15 @@
 
 		int blockLength = 0;
 		for (int i=0; i < encBlock.encodedData.size(); i++){ //for each other block in encoded data
-			std::vector<int> bitLengths; //maybe optimise later by setting this to size of encodedData.size() and using indexing rather than push_back
+		std::vector<int> bitLengths; //maybe optimise later by setting this to size of encodedData.size() and using indexing rather than push_back
 			for (int j=0; j < encBlock.encodedData[i].size(); j++){ //for each sub-block in block
-				int binLength = binaryString(encBlock.encodedData[i][j]).length();  // For each val in sub-block
-				bitLengths.push_back(binLength);
+				// int binLength = binaryString(encBlock.encodedData[i][j]).length();  // For each val in sub-block
+				// bitLengths.push_back(binLength);
+				blockLength += 60;
 			}
-			blockLength += 60;
+
 		}
+		
 		int sum = codewordLength + blockLength;
 		return sum;
 	}

@@ -38,6 +38,7 @@ public:
 	void loadData();
 	void printData();
 	float getCompressionRatio();
+	int getDataLength();
 	void genSamples(bool random);
 	virtual Encoded encode(std::vector<int> &block);
 	std::string binaryString(int n);
