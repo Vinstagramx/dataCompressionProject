@@ -100,25 +100,32 @@ def save(data, out):
         f.write(string)
     f.close()
 
+def load_files():
+    names = []; cavity_indices = []
+    with open("cavity_positions.txt") as f:
+        data = f.readlines()#.split(" ")
+        for i in data:
+            temp = i.split(" ")
+            names.append(temp[0]+"_cavity.txt")
+            cavity_indices.append(int(temp[1].strip("\n")))
+    return (names, cavity_indices)
+
 if __name__ == "__main__":
     file_names = []
-    wave_data = gen_wave_data(8, 5, 1.5) #so we use the same interference for each wave, just adding a new one each time
-    data = load_data(sys.argv[1])
-    dc = dc_interference() #generate consistent dc interference
-    for i in range(0,9):
-        out_data = simulate_interference(wave_data[:i+1], data, dc) #only use i waves in the interference
-        outfile = sys.argv[1][:9] + "_modified_"+str(i)+".txt"
-        save(out_data, outfile)
-        file_names.append(sys.argv[1][:9]+ "_modified_"+str(i)+".txt")
-    f = open("temp_file_list.txt", "w")
-    for i in range(len(file_names)):
-        f.write(file_names[i] + "\n")
-    
-def sin_and_five(PATH):
     wave_data = gen_wave_data(5, 5, 1.5) #so we use the same interference for each wave, just adding a new one each time
-    data = load_data(PATH)
+    names = load_files()[0]
     dc = dc_interference() #generate consistent dc interference
-    out_data = simulate_interference(wave_data, data, dc)
-    out_data = out_data + add_sine_wave(out_data[0], 6, 15, random=False)
-    outfile = PATH[:9] + "_modified_6_waves.txt"
-    save(out_data, outfile)
+    for name in names:
+        print(name)
+        data = load_data(name)
+        
+        out_data = simulate_interference(wave_data, data, dc) #only use i waves in the interference
+        for d in range(3):
+            out_data[1][d] = out_data[1][d] + add_sine_wave(out_data[0], 6, 15, random=False)
+        outfile = name[:9] + "_interference.txt"
+        save(out_data, outfile)
+        file_names.append(name[:9]+ "_interference.txt")
+        f = open("temp_interference_file_list.txt", "w")
+        for i in range(len(file_names)):
+            f.write(file_names[i] + "\n")
+    
