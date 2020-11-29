@@ -13,6 +13,6 @@ def load_data(path):
     fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.float) #does this round down or nearest - if we can't reconstruct data look at this 
     return fixed_array
 
-data = load_data("C1_160309_cavity.txt")
+data = load_data("C2_160313_cavity.txt")
 time = np.array([i for i in range(len(data[1]))])*0.14866719
 plt.plot(time, data[0])
