@@ -51,6 +51,7 @@ def save(data, out):
         f.write(string)
     f.close()
 
+#%%
 if __name__ == "__main__":
     file_names = []
     #wave_data = gen_wave_data(8, 5, 1.5) #so we use the same interference for each wave, just adding a new one each time
