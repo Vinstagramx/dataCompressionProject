@@ -309,7 +309,7 @@
 				bitLengths.push_back(binLength);
 			}
 			int maxVal = *std::max_element(bitLengths.begin(), bitLengths.end()); //use * as std::max_element returns iterator
-			blockLength += maxVal*m_blockSize; //block bit length should be the length of longest bit * size of block (implict truncation)
+			blockLength += maxVal * encBlock.encodedData[i].size(); //block bit length should be the length of longest bit * size of block (implict truncation)
 		}
 		int sum = codewordLength + blockLength;
 		return sum;
@@ -388,7 +388,7 @@
 				bitLengths.push_back(binLength);
 			}
 			int maxVal = *std::max_element(bitLengths.begin(), bitLengths.end()); //use * as std::max_element returns iterator
-			blockLength += maxVal*m_blockSize; //block bit length should be the length of longest bit * size of block (implict truncation)
+			blockLength += maxVal * encBlock.encodedData[i].size(); //block bit length should be the length of longest bit * size of block (implict truncation)
 		}
 		int sum = codewordLength + blockLength;
 		return sum;
