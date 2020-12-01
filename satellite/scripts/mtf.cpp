@@ -43,7 +43,7 @@ std::vector<std::vector<std::vector<float>>> split_mtf(std::vector<std::string> 
 			std::vector<float> compressionRatios;
 			d->setDirection(dirs[j]);
 			std::cout<< "file: " << fileList[file] << " in direction: " << dirs[j] << "\n";
-			int min_bs = ITERATIONS + 3;
+			int min_bs = ITERATIONS * 2 + 1;
 			for (int i=min_bs; i < 100; i++){
 				d->setBlockSize(i);
 				d->genSamples(false);
