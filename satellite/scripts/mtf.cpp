@@ -14,6 +14,7 @@ std::string OUTFILE = "data/default.txt";
 std::string FILELIST = "file_list.txt";
 int BITS = 14;
 std::string TOLERANCE = "False";
+int ITERATIONS = 1;
 
 bool terminateEarly(std::vector<float> vecIn){
 	/*Slice input vector of float compression ratios to 7 (can change this later) then check if each entry is less
@@ -34,7 +35,7 @@ std::vector<std::vector<std::vector<float>>> split_mtf(std::vector<std::string> 
 	std::vector<std::vector<std::vector<float>>> fileCompressionRatios;
 	std::string dirs[3] = {"x", "y", "z"};
 	for (int file=0; file < fileList.size(); file++){
-		Encoder temp = Encoder(5, fileList[file], SAMPLE_SIZE, "x", MODE, BITS);
+		Encoder temp = Encoder(5, fileList[file], SAMPLE_SIZE, "x", MODE, BITS, ITERATIONS);
 		Encoder* d = temp.makeEncoder(ENC_TYPE);
 		d->loadData();
 		std::vector<std::vector<float>> directionCompressionRatios;
@@ -42,7 +43,8 @@ std::vector<std::vector<std::vector<float>>> split_mtf(std::vector<std::string> 
 			std::vector<float> compressionRatios;
 			d->setDirection(dirs[j]);
 			std::cout<< "file: " << fileList[file] << " in direction: " << dirs[j] << "\n";
-			for (int i=3; i < 100; i++){
+			int min_bs = ITERATIONS + 3;
+			for (int i=min_bs; i < 100; i++){
 				d->setBlockSize(i);
 				d->genSamples(false);
 				d->encodeData(false);
@@ -62,7 +64,7 @@ std::vector<std::vector<std::vector<float>>> split_mtf(std::vector<std::string> 
 }
 
 int main(int argc, char* argv[]){
-	if (argc != 8){
+	if (argc != 9){
 		std::cout << "Please supply six command line arguments, encoder type, sample size, mode, outfile, file list, and bit length\n";
 		exit(EXIT_FAILURE);
 	}
@@ -73,6 +75,7 @@ int main(int argc, char* argv[]){
 	FILELIST = argv[5];
 	BITS = std::stoi(argv[6]);
 	TOLERANCE = argv[7];
+	ITERATIONS = std::stoi(argv[8]);
 	auto start = std::chrono::high_resolution_clock::now();
 	std::vector<std::string> filePaths = generateFileList(FILELIST);
 	std::vector<std::vector<std::string>> splitFilePaths{{}, {}, {}, {}};

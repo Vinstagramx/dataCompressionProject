@@ -1,32 +1,36 @@
 #include "encoder.h"
 //TO DO - MAKE THE ENCODER TAKE SOME KINDA BIT LENGTH PARAMETER SO IT'S SUITABLE FOR MODIFIED DATA
-	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None", int bits = 17){
+	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None", int bits = 17, int iterations = 1){
 		m_blockSize = bs;
 		m_fileName = f;
 		m_sampleNumber = samples;
 		m_direction = dir;
 		m_mode = mode;
 		m_bits = bits;
+		m_iterations = iterations;
 	}
 	
 	Encoder *Encoder::makeEncoder(std::string choice){
-		if (choice=="Delta"){
-			return new Delta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+		if (choice == "Delta" && m_iterations == 1){
+			return new Delta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits, m_iterations);
 		}
 		else if (choice=="Golomb"){
-			return new Golomb(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+			return new Golomb(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits, m_iterations);
 		}
 		else if (choice=="StepDelta"){
-			return new StepDelta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+			return new StepDelta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits, m_iterations);
 		}
 		else if (choice == "Simple8b"){
-			return new Simple8b(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+			return new Simple8b(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits, m_iterations);
 		}
 		else if (choice == "DeltaDelta"){
-			return new DeltaDelta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+			return new DeltaDelta(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits, m_iterations);
+		}
+		else if (choice == "Delta" && m_iterations >= 1){
+			return new DeltaIter(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits, m_iterations);
 		}
 		else{
-			return new Encoder(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits);
+			return new Encoder(m_blockSize, m_fileName, m_sampleNumber, m_direction, m_mode, m_bits, m_iterations);
 		}
 	}
 
@@ -589,6 +593,44 @@
 		return decodedBlock;
 	}
 	
+	Encoded DeltaIter::encode(std::vector<int> &block){
+		/*Overwrite the encode method with multiple iterations of delta encoding - subtract each element
+		from the previous element then return the encoded block. Repeat this procedure for m_iterations.*/
+		int codeword = block[0];
+		Encoded encodedBlock;
+		std::vector<int> encodedVec;
+		std::vector<int> codewords;
+		//  Need to carry out the delta operation once, in order to generate encodedVec to be used in difference()
+		//  Need a new vector to not alter the block itself
+		for (int i = 0; i < block.size() -1; i++){
+			encodedVec.push_back(block[i]-block[i-1]);
+		}
+		codewords.push_back(codeword);
+
+		// Using difference() iteratively
+		for (int j=0; j < m_iterations - 1; j++){
+			difference(codewords, encodedVec);
+		}
+		encodedBlock.codewords = codewords;
+		encodedBlock.encodedData = std::vector<std::vector<int>>{encodedVec};
+		return encodedBlock;
+	}
+
+	void DeltaIter::difference(std::vector<int> codeVec, std::vector<int> deltaVec){
+		/* Differencing method. Takes two vector arguments - one is the codeword vector, and the other
+		is the delta vector to be iterated over. First element of delta vector is pushed back into codeword vector,
+		and the differences of deltaVec are found. deltaVec is then set to be equal to these differences, allowing the 
+		process to be repeated again. */
+		std::vector<int> tempVec;
+		codeVec.push_back(deltaVec[0]);
+		for (int i = 1; i < deltaVec.size() - 1; i++){
+			tempVec.push_back(deltaVec[i]-deltaVec[i-1]);
+		}
+		deltaVec.clear();
+		deltaVec = tempVec;
+		return;
+	}
+
     Encoded DeltaGolomb::encode(std::vector<int> &block){
 		/*Overwrite the encode method with Golomb specific implementation - divide each number
 		in block by fixed paramter b which is determined by the mode. Store the quotient q in

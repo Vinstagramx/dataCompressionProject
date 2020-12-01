@@ -28,9 +28,10 @@ public:
 	std::string m_mode;
 	float m_compressionRatio;
 	int m_bits;
+	int m_iterations;
     Encoder();
    
-    explicit Encoder(int bs, std::string f, int samples, std::string dir, std::string mode, int bits);
+    explicit Encoder(int bs, std::string f, int samples, std::string dir, std::string mode, int bits, int iterations);
 	Encoder *makeEncoder(std::string choice);
 	void setBlockSize(int bs);
 	void printParams();
@@ -95,6 +96,14 @@ class DeltaGolomb : public Golomb
 public:
 	using Golomb::Golomb;
 	Encoded encode(std::vector<int> &block);
+};
+
+class DeltaIter : public Encoder
+{
+public:
+	using Encoder::Encoder;
+	Encoded encode(std::vector<int> &block);
+	void difference(std::vector<int> mainvec, std::vector<int> tempvec);
 };
 #endif
 
