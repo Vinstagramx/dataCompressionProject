@@ -602,7 +602,7 @@
 		std::vector<int> codewords;
 		//  Need to carry out the delta operation once, in order to generate encodedVec to be used in difference()
 		//  Need a new vector to not alter the block itself
-		for (int i = 0; i < block.size() -1; i++){
+		for (int i = 1; i < block.size() -1; i++){
 			encodedVec.push_back(block[i]-block[i-1]);
 		}
 		codewords.push_back(codeword);
@@ -616,7 +616,7 @@
 		return encodedBlock;
 	}
 
-	void DeltaIter::difference(std::vector<int> codeVec, std::vector<int> deltaVec){
+	void DeltaIter::difference(std::vector<int> &codeVec, std::vector<int> &deltaVec){
 		/* Differencing method. Takes two vector arguments - one is the codeword vector, and the other
 		is the delta vector to be iterated over. First element of delta vector is pushed back into codeword vector,
 		and the differences of deltaVec are found. deltaVec is then set to be equal to these differences, allowing the 

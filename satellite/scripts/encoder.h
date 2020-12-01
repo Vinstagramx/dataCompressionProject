@@ -103,7 +103,7 @@ class DeltaIter : public Encoder
 public:
 	using Encoder::Encoder;
 	Encoded encode(std::vector<int> &block);
-	void difference(std::vector<int> mainvec, std::vector<int> tempvec);
+	void difference(std::vector<int> &codeVec, std::vector<int> &deltaVec);
 };
 #endif
 
