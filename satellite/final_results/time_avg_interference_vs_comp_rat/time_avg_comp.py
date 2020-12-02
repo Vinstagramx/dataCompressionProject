@@ -98,7 +98,7 @@ def save(data, out):
     time = data[0]
     f = open(out, "w")
     for i in range(len(time)):
-        string = str(time[i]) + "  " + str(data[x1][0][i]) + "  " + str(data[1][1][i]) + "  " + str(data[1][2][i]) + "\n"
+        string = str(time[i]) + "  " + str(data[1][0][i]) + "  " + str(data[1][1][i]) + "  " + str(data[1][2][i]) + "\n"
         f.write(string)
     f.close()
 
