@@ -12,7 +12,7 @@ int SAMPLE_SIZE = 7000;
 std::string MODE = "mean"; //can be "min" or "max"
 std::string OUTFILE = "data/default.txt";
 std::string FILELIST = "file_list.txt";
-int BITS = 14;
+int BITS = 16;
 std::string TOLERANCE = "False";
 int ITERATIONS = 1;
 
@@ -49,6 +49,8 @@ std::vector<std::vector<std::vector<float>>> split_mtf(std::vector<std::string> 
 				d->genSamples(false);
 				d->encodeData(false);
 				float compRat = d->getCompressionRatio();
+				d->printParams();
+				//std::cout << "Compression ratio at block " << i << " is: " << compRat << "\n";
 				compressionRatios.push_back(compRat);
 				if (terminateEarly(compressionRatios)){
 					std::cout << "local max found, terminating \n";

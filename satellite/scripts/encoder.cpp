@@ -1,6 +1,6 @@
 #include "encoder.h"
 //TO DO - MAKE THE ENCODER TAKE SOME KINDA BIT LENGTH PARAMETER SO IT'S SUITABLE FOR MODIFIED DATA
-	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None", int bits = 17, int iterations = 1){
+	Encoder::Encoder(int bs=2, std::string f="test.txt", int samples=1000, std::string dir="x", std::string mode="None", int bits = 16, int iterations = 1){
 		m_blockSize = bs;
 		m_fileName = f;
 		m_sampleNumber = samples;
@@ -197,7 +197,7 @@
 		Encoded encodedBlock;
 		std::vector<int> encodedVec;
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
-		for (int i=1; i<block.size()-1; i++){
+		for (int i=1; i<block.size(); i++){
 			encodedVec.push_back(block[i]-block[i-1]);
 		}
 		encodedBlock.codewords = std::vector<int>{codeword};
@@ -563,12 +563,12 @@
 		std::vector<int> codewords;
 		std::vector<int> encodedDeltaVec;
 		//encodedVec.push_back(0); //first value should be 0 as difference from codeword
-		for (int i=1; i<block.size()-1; i++){
+		for (int i=1; i<block.size(); i++){
 			encodedVec.push_back(block[i]-block[i-1]);
 		}
 		codewords.push_back(codeword);
 		codewords.push_back(encodedVec[0]);
-		for (int j=1; j < encodedVec.size()-1; j++){
+		for (int j=1; j < encodedVec.size(); j++){
 			encodedDeltaVec.push_back(encodedVec[j]-encodedVec[j-1]);
 		}
 		encodedBlock.codewords = codewords;
@@ -587,7 +587,7 @@
 		int secondValue = deltaCodeword;
 		decodedBlock.push_back(firstValue);
 		decodedBlock.push_back(secondValue);
-		for (int i=2; i < encBlock.size()-1; i++){
+		for (int i=2; i < encBlock.size(); i++){
 			decodedBlock.push_back(encBlock[i-1]+decodedBlock[i-1]); //i think enc block doesn't have 0 as first value
 		}
 		return decodedBlock;
@@ -602,13 +602,13 @@
 		std::vector<int> codewords;
 		//  Need to carry out the delta operation once, in order to generate encodedVec to be used in difference()
 		//  Need a new vector to not alter the block itself
-		for (int i = 1; i < block.size() -1; i++){
+		for (int i = 1; i < block.size(); i++){
 			encodedVec.push_back(block[i]-block[i-1]);
 		}
 		codewords.push_back(codeword);
 
 		// Using difference() iteratively
-		for (int j=0; j < m_iterations - 1; j++){
+		for (int j=0; j < m_iterations-1 ; j++){
 			difference(codewords, encodedVec);
 		}
 		encodedBlock.codewords = codewords;
@@ -623,7 +623,7 @@
 		process to be repeated again. */
 		std::vector<int> tempVec;
 		codeVec.push_back(deltaVec[0]);
-		for (int i = 1; i < deltaVec.size() - 1; i++){
+		for (int i = 1; i < deltaVec.size(); i++){
 			tempVec.push_back(deltaVec[i]-deltaVec[i-1]);
 		}
 		deltaVec.clear();
@@ -654,7 +654,7 @@
 		std::vector<int> deltaBlock;
 		int deltaCodeword = block[0];
 		//deltaBlock.push_back(deltaCodeword)
-		for (int n=1; n<block.size()-1; n++){
+		for (int n=1; n<block.size(); n++){
 			deltaBlock.push_back(block[n]-block[n-1]);
 		}
 		

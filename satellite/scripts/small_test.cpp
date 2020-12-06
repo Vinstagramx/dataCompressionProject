@@ -8,10 +8,11 @@ int main(int argc, char* argv[]){
 	std::string FILELIST = argv[5];
 	int BITS = std::stoi(argv[6]);
 	std::vector<std::string> filePaths = generateFileList(FILELIST);
+	int ITERATIONS = std::stoi(argv[7]);
 	std::string dirs[3] = {"x", "y", "z"};
 	std::vector<float> maxCompressionRatios;
 	for (int fileIndex=0; fileIndex < filePaths.size(); fileIndex++){
-		Encoder temp = Encoder(3, filePaths[fileIndex], SAMPLE_SIZE, "x", MODE, BITS);
+		Encoder temp = Encoder(3, filePaths[fileIndex], SAMPLE_SIZE, "x", MODE, BITS, ITERATIONS);
 		Encoder* d = temp.makeEncoder(ENC_TYPE);
 		d->loadData();
 		for (int j=0; j<3; j++){
