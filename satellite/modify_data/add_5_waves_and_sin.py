@@ -119,7 +119,7 @@ if __name__ == "__main__":
         
         out_data = simulate_interference(wave_data, data, dc) #only use i waves in the interference
         for d in range(3):
-            out_data[1][d] = out_data[1][d] + add_sine_wave(out_data[0], 6, 15, random=False)
+            out_data[1][d] = out_data[1][d] + add_sine_wave(out_data[0], 6, 5, random=False)
         outfile = name[:9] + "_interference.txt"
         save(out_data, outfile)
         file_names.append(name[:9]+ "_interference.txt")
