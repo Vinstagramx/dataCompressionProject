@@ -12,7 +12,7 @@ import sys
 
 random.seed(1) #set seed for random generation
 
-time_interval = 0.14866719 
+time_interval = 1/22 #0.14866719 
 
 def load_data(path):
         data = np.loadtxt(path).T
@@ -20,15 +20,13 @@ def load_data(path):
         fixed_array = np.array([fixed_x, fixed_y, fixed_z], dtype = np.float) #does this round down or nearest - if we can't reconstruct data look at this 
         return fixed_array
 
-def square_wave(t, T, offset=0, amplitude = 1):
+def square_wave(t, freq, offset=0, amplitude = 1):
+    T = 1/freq
     period = t//T #function repeats so this is the number of cycles
-    if t < 0:
-        v_in = 1
-    else:
-        if t < (2*period+1)*T/2: #halfway point
-            v_in = 0
-        elif t < (period+1)*T and t > (2*period+1)*T/2:
-            v_in = amplitude
+    if t < (2*period+1)*T/2: #halfway point
+        v_in = -amplitude/2
+    else: #t < (period+1)*T and t > (2*period+1)*T/2:
+        v_in = amplitude/2
     return v_in
 
 def dc_interference():
@@ -71,11 +69,11 @@ def gen_wave_data(n, max_amp, max_freq):
     #wave_data.append(major_wave)
     #wave_data.ppend((1,0,0))
     for i in range(n-1):
-        temp_wave = (random.uniform(0.8,1.2), 0, random.uniform(0.25,3.5))
+        temp_wave = (random.uniform(0.8,30), 0, random.uniform(0.25,3.5))
         wave_data.append(temp_wave)
     return wave_data
 
-def add_sine_wave(time, max_amp = 10, max_freq = 30, random=True):
+def add_sine_wave(time, max_amp = 10, max_freq = 10, random=True):
     """Generate a sinusoidal wave of a random amplitude and frequency, using an input array
     of data (for start and end values, and also number of samples of sine wave to take)
     --> Freq: up to 30Hz
@@ -85,7 +83,7 @@ def add_sine_wave(time, max_amp = 10, max_freq = 30, random=True):
     #samples = np.linspace(array[0], array[1], num = sample_num)
     if random:
         amp = max_amp * np.random.random(size=None)
-        freq = max_freq * np.random.random(size = None)
+        freq = random.uniform(0.1, max_freq)
     else:
         amp = max_amp
         freq = max_freq
@@ -112,7 +110,7 @@ def load_files():
 
 if __name__ == "__main__":
     file_names = []
-    wave_data = gen_wave_data(5, 5, 1.5) #so we use the same interference for each wave, just adding a new one each time
+    wave_data = gen_wave_data(5, 5, 30) #so we use the same interference for each wave, just adding a new one each time
     names = load_files()[0]
     dc = dc_interference() #generate consistent dc interference
     for name in names:
