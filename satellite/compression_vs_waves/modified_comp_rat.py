@@ -31,13 +31,17 @@ def main(file):
     for i in range(0, len(lines)):
         data[i%3].append(lines[i])
     wave_no = [i for i in range(0, len(data[0]))]
+    d_colours = ["#00476e", "#0072b0", "#009aed"]
+    plt.vlines(1, 0, 100, color="red", linestyles ="--", lw=4)
+    plt.text(1.2, 60, "Sine wave added", color= "red", fontsize=24)
     for i in range(3):
         plt.plot(wave_no, data[i], label=labels[i], marker=markers[i], \
-                 ms=20,ls="-",  lw=4)
+                 ms=20,ls="-",  lw=4, color=d_colours[i])
+    
     pretty_graph("Number of waves", "Compression ratio (%)", \
-                 "Compression ratio of Simple-8b encoding as a function of interference", 24)
+                 "Compression ratio of $\Delta$ encoding as a function of interference", 24)
     plt.legend(fontsize=20)
     plt.gca().set_facecolor("#fffcf5")
-    plt.savefig("compression_vs_waves_C3_1603011_Simple8.pdf")
+    plt.savefig("compression_vs_waves_C1_160309_cavity_delta.pdf")
 
 main("temp_compression_data.txt")
