@@ -153,13 +153,16 @@ class Encoder(object):
             block = self._current_data[block_start:(block_start+self._block_size)]
             encoded_data = self.encode(block)
             encoded_block = encoded_data[1] #encode(block)[0] is the codeword, [1] the data encoded by codeword
+            print(block)
+            print(encoded_block)
             if stats:
                 lengths = self.get_block_bit_lengths(encoded_block)
+                print(lengths)
                 self.block_stats(lengths)   
             if ratio:
                 codeword_length = sum(self.get_block_bit_lengths(encoded_data[0]))
                 self.update_bit_diff(codeword_length, block, encoded_block) #change this when golomb breaks!!
-
+                print(self._original_bit_length, self._encoded_bit_length, codeword_length)
         if stats:
             print("Doing stats")
             self.plot_block_stats()
