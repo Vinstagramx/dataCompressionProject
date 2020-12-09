@@ -103,8 +103,13 @@ if __name__ == "__main__":
     wave_data = gen_wave_data(8, 5, 30) #so we use the same interference for each wave, just adding a new one each time
     data = load_data(sys.argv[1])
     dc = dc_interference() #generate consistent dc interference
+    sin_freq = random.uniform(0.1, 10); sin_amp = random.uniform(1,6)
     for i in range(0,9):
+        print("adding", i, " waves")
         out_data = simulate_interference(wave_data[:i+1], data, dc) #only use i waves in the interference
+        if i > 0:
+            for j in range(3):
+                out_data[1][j] = out_data[1][j] + add_sine_wave(out_data[0], sin_amp, sin_freq, random=False)
         outfile = sys.argv[1][:9] + "_modified_"+str(i)+".txt"
         save(out_data, outfile)
         file_names.append(sys.argv[1][:9]+ "_modified_"+str(i)+".txt")
