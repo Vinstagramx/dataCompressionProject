@@ -206,7 +206,7 @@ class DeltaIter(Encoder):
             codewords.append(encoded_vec[0])
             for j in range(1, len(encoded_vec)):
                 temp.append(encoded_vec[j]-encoded_vec[j-1])
-            #print("econded vec is: ", temp)
+            print("encoded vec is: ", temp)
             encoded_vec = temp
         #print("block is ", block)
         #print("codewords are: ", codewords)
